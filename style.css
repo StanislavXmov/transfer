@@ -1,0 +1,38 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 16px;
+  min-width: 320px;
+  min-height: 100vh;
+  font-family: sans-serif;
+}
+
+.title {
+  text-align: center;
+  margin: 0px
+}
+
+.container {
+  margin: 16px auto 0;
+  width: 1016px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+#graphLeft, #graphRight {
+  position: relative;
+}
+
+.graphLeft {
+  padding-left: 100px;
+  border: 1px dashed #0000002e;
+}
+
+.graphRight {
+  padding-left: 100px;
+  border: 1px dashed #0000002e;
+}
