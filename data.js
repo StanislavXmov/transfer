@@ -102,7 +102,8 @@ export const graph2 = {
     {
       source: 0,
       target: 1,
-      value: 638
+      value: 638,
+      cb: 'next'
     },
     {
       source: 0,
@@ -133,6 +134,71 @@ export const graph2 = {
       source: 0,
       target: 7,
       value: 18
+    },
+  ]
+}
+
+export const graphNext = {
+  nodes: [
+    {
+      node: 0,
+      name: 'Top Leagues'
+    },
+    {
+      node: 1,
+      name: 'Test1'
+    },
+    {
+      node: 2,
+      name: 'Test2'
+    },
+    {
+      node: 3,
+      name: 'Test3'
+    },
+    {
+      node: 4,
+      name: 'Test4'
+    },
+    {
+      node: 5,
+      name: 'Test5'
+    },
+    {
+      node: 6,
+      name: 'Test6'
+    },
+  ],
+  links: [
+    {
+      source: 0,
+      target: 1,
+      value: 100,
+    },
+    {
+      source: 0,
+      target: 2,
+      value: 100
+    },
+    {
+      source: 0,
+      target: 3,
+      value: 80
+    },
+    {
+      source: 0,
+      target: 4,
+      value: 50
+    },
+    {
+      source: 0,
+      target: 5,
+      value: 50
+    },
+    {
+      source: 0,
+      target: 6,
+      value: 10
     },
   ]
 }
