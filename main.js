@@ -3,8 +3,16 @@ import { sankey, sankeyLinkHorizontal, sankeyLeft } from 'd3-sankey';
 import './style.css';
 
 import { graph1, graph2, graphNext} from './data';
+import { filterFromTopToRegion } from './filterFromTopToRegion';
 
-console.log(graph1);
+
+const getCsv = async () => {
+  const data = await d3.csv('./football-transfers.csv');
+  // console.log(data);
+  createGraph('#graphRight', 'right', filterFromTopToRegion(data));
+}
+
+getCsv();
 
 const clearGraph = (id, type) => {
   const el = document.querySelector(id);
@@ -19,13 +27,11 @@ const cb = {
 }
 
 // const max = graph1.links.reduce((prev, current, i) => prev += current.value, 0);
-// console.log(max);
 
 const margin = {top: 10, right: 10, bottom: 10, left: 10};
 const width = 400 - margin.left - margin.right;
 const height = 640 - margin.top - margin.bottom;
 
-// createGraph('#graphLeft', 'left'); 
 const createGraph = (id, type, graph) => {
   const svg = d3.select(id).append("svg")
     .attr("width", width + margin.left + margin.right)
@@ -97,7 +103,7 @@ const createGraph = (id, type, graph) => {
       .attr("fill", '#fff');
 }
 
-createGraph('#graphLeft', 'left', graph1);
-createGraph('#graphRight', 'right', graph2);
+// createGraph('#graphLeft', 'left', graph1);
+// createGraph('#graphRight', 'right', graph2);
 
 
