@@ -21,8 +21,6 @@ const getCsv = async () => {
 
   const leftData = filterToTopInInside(data);
   const rightData = filterFromTopOutInside(data);
-  // createGraph('#graphLeft', 'left', leftData, height);
-  // createGraph('#graphRight', 'right', rightData, height);
 
   if (leftData.transfers > rightData.transfers) {
     const dh = rightData.transfers / leftData.transfers;

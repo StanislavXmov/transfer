@@ -9,6 +9,22 @@ export const filterFromRegionInInsideToLegueTop = (data) => {
   const insideType = 'Inside';
   const toRegionField = 'To Region';
   const pathField = '';
+  const regionsOrder = [
+    'Top', 
+    'Europe', 
+    'Asia', 
+    'Latin America', 
+    'US & Australia', 
+    'Africa', 
+    '-'
+  ];
+  const leaguesOrder = [
+    {key: 'Premier League, England', title: 'Premier League 🇬🇧'},
+    {key: 'Bundesliga, German', title: 'Bundesliga 🇩🇪'},
+    {key: 'LaLiga, Spain', title: 'LaLiga 🇪🇸'},
+    {key: 'Serie A, Italy', title: 'Serie A 🇮🇹'},
+    {key: 'Ligue 1, France', title: 'Ligue 1 🇫🇷'}
+  ];
 
   // From Region In Inside  => To League Top
   const regions = {};
@@ -24,7 +40,7 @@ export const filterFromRegionInInsideToLegueTop = (data) => {
   const links = [];
   let transfers = 0;
 
-  Object.keys(regions).forEach(key => {
+  regionsOrder.forEach(key => {
     const fromRegions = data.filter(
       d => (d[pathField] === insideType || d[pathField] === inType) && d[fromRegionField] === key && d[toRegionField] === region
     );
@@ -45,31 +61,29 @@ export const filterFromRegionInInsideToLegueTop = (data) => {
         }
       }, leagues);
 
-      Object.keys(leagues).forEach(key => {
-        if (!nodes.find(n => n.name === key)) {
+      leaguesOrder.forEach(key => {
+        if (!nodes.find(n => n.name === key.title)) {
           const index = nodes.length;
           nodes.push({
             node: index,
-            name: key,
+            name: key.title,
             root: true
           });
         }
       });
 
-      Object.keys(leagues).forEach(key => {
-        const node = nodes.find(n => n.name === key);
-        if (node) {
+      leaguesOrder.forEach(key => {
+        const node = nodes.find(n => n.name === key.title);
+        if (node && leagues[key.key]) {
           links.push({
             source: index,
             target: node.node,
-            value: leagues[key].value,
+            value: leagues[key.key].value,
           });
         }
       });
     }
   });
   
-  // console.log({nodes, links});
-  // console.log(transfers);
   return {nodes, links, transfers};
 }

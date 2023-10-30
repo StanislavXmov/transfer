@@ -9,6 +9,22 @@ export const filterFromLeagueTopOutInsideToRegion = (data) => {
   const insideType = 'Inside';
   const toRegionField = 'To Region';
   const pathField = '';
+  const regionsOrder = [
+    'Top', 
+    'Europe', 
+    'Asia', 
+    'Latin America', 
+    'US & Australia', 
+    'Africa', 
+    '-'
+  ];
+  const leaguesOrder = [
+    {key: 'Premier League, England', title: 'Premier League 🇬🇧'},
+    {key: 'Bundesliga, German', title: 'Bundesliga 🇩🇪'},
+    {key: 'LaLiga, Spain', title: 'LaLiga 🇪🇸'},
+    {key: 'Serie A, Italy', title: 'Serie A 🇮🇹'},
+    {key: 'Ligue 1, France', title: 'Ligue 1 🇫🇷'}
+  ];
 
   // From League Top Out Inside => To  Region
   const leagues = {};
@@ -24,16 +40,16 @@ export const filterFromLeagueTopOutInsideToRegion = (data) => {
   const links = [];
   let transfers = 0;
 
-  Object.keys(leagues).forEach(key => {
+  leaguesOrder.forEach(key => {
     const fromLeagues = data.filter(
-      d => (d[pathField] === insideType || d[pathField] === outType) && d[fromLeagueField] === key
+      d => (d[pathField] === insideType || d[pathField] === outType) && d[fromLeagueField] === key.key
     );
     if (fromLeagues.length > 0) {
       transfers += fromLeagues.length;
       const index = nodes.length;
       nodes.push({
         node: index,
-        name: key,
+        name: key.title,
         root: true,
       });
       const regions = {};
@@ -45,7 +61,7 @@ export const filterFromLeagueTopOutInsideToRegion = (data) => {
         }
       }, regions);
       
-      Object.keys(regions).forEach(key => {
+      regionsOrder.forEach(key => {
         if (!nodes.find(n => n.name === key)) {
           const index = nodes.length;
           nodes.push({
@@ -55,9 +71,9 @@ export const filterFromLeagueTopOutInsideToRegion = (data) => {
         }
       });
 
-      Object.keys(regions).forEach(key => {
+      regionsOrder.forEach(key => {
         const node = nodes.find(n => n.name === key);
-        if (node) {
+        if (node && regions[key]) {
           links.push({
             source: index,
             target: node.node,
@@ -68,6 +84,5 @@ export const filterFromLeagueTopOutInsideToRegion = (data) => {
     }
   });
 
-  // console.log(transfers);
   return {nodes, links, transfers};
 }
