@@ -25,7 +25,6 @@ export const filterFromRegionInInsideToLegueTop = (data) => {
   let transfers = 0;
 
   Object.keys(regions).forEach(key => {
-    console.log(key);
     const fromRegions = data.filter(
       d => (d[pathField] === insideType || d[pathField] === inType) && d[fromRegionField] === key && d[toRegionField] === region
     );
@@ -70,7 +69,7 @@ export const filterFromRegionInInsideToLegueTop = (data) => {
     }
   });
   
-  console.log({nodes, links});
+  // console.log({nodes, links});
   // console.log(transfers);
   return {nodes, links, transfers};
 }

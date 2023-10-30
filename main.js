@@ -136,7 +136,7 @@ const createGraph = (id, type, graph, height) => {
           if (d.root) {
             return `${d.x0 + 100}px`;
           } else {
-            return `${d.x0 + 20}px`;
+            return `${d.x0 + 40}px`;
           }
         }
       })

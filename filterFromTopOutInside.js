@@ -6,6 +6,15 @@ export const filterFromTopOutInside = (data) => {
   const inType = 'In';
   const insideType = 'Inside';
   const pathField = '';
+  const regionsOrder = [
+    'Top', 
+    'Europe', 
+    'Asia', 
+    'Latin America', 
+    'US & Australia', 
+    'Africa', 
+    '-'
+  ];
 
   const fromTopRegions = data.filter(d => d[fromRegionField] === region);
   const transfers = fromTopRegions.length;
@@ -28,21 +37,26 @@ export const filterFromTopOutInside = (data) => {
   const nodes = [startNode];
   const links = [];
 
-  Object.keys(regions).forEach(key => {
-    const index = nodes.length;
-    regions[key].index = index;
-    nodes.push({
-      node: index,
-      name: regions[key].title,
-    });
+  regionsOrder.forEach(key => {
+    if (regions[key]) {
+      const index = nodes.length;
+      regions[key].index = index;
+      nodes.push({
+        node: index,
+        name: regions[key].title,
+      });
+    }
   });
 
-  Object.keys(regions).forEach(key => {
-    links.push({
-      source: 0,
-      target: regions[key].index,
-      value: regions[key].value,
-    });
+  regionsOrder.forEach(key => {
+    if (regions[key]) {
+      links.push({
+        source: 0,
+        target: regions[key].index,
+        value: regions[key].value,
+      });
+    }
   });
+  console.log({nodes, links, transfers});
   return {nodes, links, transfers};
 }
