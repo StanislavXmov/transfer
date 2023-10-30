@@ -4,12 +4,63 @@ import './style.css';
 
 import { graph1, graph2, graphNext} from './data';
 import { filterFromTopToRegion } from './filterFromTopToRegion';
+import { filterFromRegionInInsideToLegueTop } from './filterFromRegionInInsideToLegueTop';
+import { filterFromRegionOutToLegueTop } from './filterFromRegionOutToLegueTop';
+import { filterFromLeagueTopOutInsideToRegion } from './filterFromLeagueTopOutInsideToRegion';
+import { filterToTopInInside } from './filterToTopInInside';
+import { filterFromTopOutInside } from './filterFromTopOutInside';
 
+const margin = {top: 10, right: 10, bottom: 10, left: 10};
+const width = 400 - margin.left - margin.right;
+const height = 640 - margin.top - margin.bottom;
+const onChangeElement = document.getElementById('changeGraph');
 
 const getCsv = async () => {
   const data = await d3.csv('./football-transfers.csv');
-  // console.log(data);
-  createGraph('#graphRight', 'right', filterFromTopToRegion(data));
+  console.log(data);
+
+  const leftData = filterToTopInInside(data);
+  const rightData = filterFromTopOutInside(data);
+  // createGraph('#graphLeft', 'left', leftData, height);
+  // createGraph('#graphRight', 'right', rightData, height);
+
+  if (leftData.transfers > rightData.transfers) {
+    const dh = rightData.transfers / leftData.transfers;
+    createGraph('#graphLeft', 'left', leftData, height);
+    createGraph('#graphRight', 'right', rightData, height * dh);
+  } else {
+    const dh = leftData.transfers / rightData.transfers;
+    createGraph('#graphRight', 'right', rightData, height);
+    createGraph('#graphLeft', 'left', leftData, height * dh);
+  }
+
+  onChangeElement.addEventListener('change', (e) => {
+    clearGraph('#graphRight', 'right');
+    clearGraph('#graphLeft', 'left');
+    if (e.target.checked) {
+      const nextLeftData = filterFromRegionInInsideToLegueTop(data);
+      const nextRightData = filterFromLeagueTopOutInsideToRegion(data);
+      if (nextLeftData.transfers > nextRightData.transfers) {
+        const dh = nextRightData.transfers / nextLeftData.transfers;
+        createGraph('#graphLeft', 'left', nextLeftData, height);
+        createGraph('#graphRight', 'right', nextRightData, height * dh);
+      } else {
+        const dh = nextLeftData.transfers / nextRightData.transfers;
+        createGraph('#graphRight', 'right', nextRightData, height);
+        createGraph('#graphLeft', 'left', nextLeftData, height * dh);
+      }
+    } else {
+      if (leftData.transfers > rightData.transfers) {
+        const dh = rightData.transfers / leftData.transfers;
+        createGraph('#graphLeft', 'left', leftData, height);
+        createGraph('#graphRight', 'right', rightData, height * dh);
+      } else {
+        const dh = leftData.transfers / rightData.transfers;
+        createGraph('#graphRight', 'right', rightData, height);
+        createGraph('#graphLeft', 'left', leftData, height * dh);
+      }
+    }
+  });
 }
 
 getCsv();
@@ -26,13 +77,7 @@ const cb = {
   }
 }
 
-// const max = graph1.links.reduce((prev, current, i) => prev += current.value, 0);
-
-const margin = {top: 10, right: 10, bottom: 10, left: 10};
-const width = 400 - margin.left - margin.right;
-const height = 640 - margin.top - margin.bottom;
-
-const createGraph = (id, type, graph) => {
+const createGraph = (id, type, graph, height) => {
   const svg = d3.select(id).append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
@@ -42,7 +87,9 @@ const createGraph = (id, type, graph) => {
   const sankeyD3 = sankey()
     .nodeWidth(20)
     .nodePadding(20)
-    .size([width, height]);
+    .size([width, height])
+    .nodeSort(null)
+    .linkSort(null);
 
   const {nodes, links} = sankeyD3({
     nodes: graph.nodes.map(d => Object.assign({}, d)),
@@ -72,12 +119,27 @@ const createGraph = (id, type, graph) => {
   d3.select(id)
     .append("span")
     .selectAll()
-    .data(nodes.filter(n => n.index !== 0))
+    .data(nodes)
+    // .data(nodes.filter(n => n.index !== 0))
     .join("span")
       .style("width", "125px")
       .style("position", "absolute")
       .style("top", d => `${d.y0 + 8}px`)
-      .style("left", d => type === 'left' ? `${d.x0 - 100}px` : `${d.x0 + 32}px`)
+      .style("left", d => {
+        if (type === 'left') {
+          if (d.root) {
+            return `${d.x0 - 200}px`;
+          } else {
+            return `${d.x0 - 100}px`;
+          }
+        } else {
+          if (d.root) {
+            return `${d.x0 + 100}px`;
+          } else {
+            return `${d.x0 + 20}px`;
+          }
+        }
+      })
       .text(d => d.name);
     
       
@@ -92,15 +154,19 @@ const createGraph = (id, type, graph) => {
         .style("left", type === 'left' ? `${width - 50}px` : `${44}px`)
         .text(d => d.value);
 
-  const rect = group.append("g")
-    .attr("stroke", "#000")
-    .attr("stroke-opacity", 0.2)
-    .append("rect")
-      .attr("x", nodes[0].x0)
-      .attr("y", nodes[0].y0)
-      .attr("height", nodes[0].y1 - nodes[0].y0)
-      .attr("width", nodes[0].x1 - nodes[0].x0)
-      .attr("fill", '#fff');
+  nodes.forEach(n => {
+    if (n.root) {
+      group.append("g")
+        .attr("stroke", "#000")
+        .attr("stroke-opacity", 0.2)
+        .append("rect")
+          .attr("x", n.x0)
+          .attr("y", n.y0)
+          .attr("height", n.y1 - n.y0)
+          .attr("width", n.x1 - n.x0)
+          .attr("fill", '#fff');
+    }
+  });
 }
 
 // createGraph('#graphLeft', 'left', graph1);

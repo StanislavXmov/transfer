@@ -2,7 +2,8 @@ export const graph1 = {
   nodes: [
     {
       node: 0,
-      name: 'Signings'
+      name: 'Signings',
+      root: true,
     },
     {
       node: 1,
@@ -67,7 +68,8 @@ export const graph2 = {
   nodes: [
     {
       node: 0,
-      name: 'Outings'
+      name: 'Outings',
+      root: true,
     },
     {
       node: 1,
