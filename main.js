@@ -15,6 +15,15 @@ const width = 400 - margin.left - margin.right;
 const height = 640 - margin.top - margin.bottom;
 const onChangeElement = document.getElementById('changeGraph');
 
+// Что происходит по клику в регион
+// 1. Если галочка снята (все лиги вместе), то 
+// слева From Country Filter Status == (in&inside) Region == (выбранный регион) To Top
+// справа From Top Status == (out&inside) To Country Region == (выбранный регион)
+
+// 2. Если галочка стоит (лиги отдельно), то 
+// слева From Country Filter Status == (in&inside) Region == (выбранный регион)  To League Filter Region == Top 
+// справа From League Region == Top, Status == (out&inside) To Country Region == (выбранный регион)
+
 const getCsv = async () => {
   const data = await d3.csv('./football-transfers.csv');
   console.log(data);
@@ -93,7 +102,7 @@ const createGraph = (id, type, graph, height) => {
     nodes: graph.nodes.map(d => Object.assign({}, d)),
     links: graph.links.map(d => Object.assign({}, d))
   });
-
+  
   const link = group.append("g")
   .attr("fill", "none")
   .attr("stroke-opacity", 0.2)
@@ -106,11 +115,39 @@ const createGraph = (id, type, graph, height) => {
     .attr("d", sankeyLinkHorizontal())
     .attr("stroke-width", d => Math.max(1, d.width))
     .style("cursor", "pointer")
-    .on("click", (e, d) => {
-      console.log({e, d}, d.value);
-      if (cb[d.cb]) {
-        cb[d.cb]();
+    // .on("click", (e, d) => {
+    //   console.log({e, d}, d.value);
+    //   if (cb[d.cb]) {
+    //     cb[d.cb]();
+    //   }
+    // });
+    .on('mouseover', (e, d) => {
+      d3.select(e.target).style("opacity", 0.8);
+      if (d.value > 100) {
+        return;
       }
+      let id;
+      if (type === 'left') {
+        id = d.source.name;
+      } else {
+        id = d.target.name;
+      }
+      d3.select(`[data-link="${id} ${type} ${d.index}"]`)
+        .style("opacity", 1);
+    })
+    .on('mouseout', (e, d) => {
+      d3.select(e.target).style("opacity", 1);
+      if (d.value > 100) {
+        return;
+      }
+      let id;
+      if (type === 'left') {
+        id = d.source.name;
+      } else {
+        id = d.target.name;
+      }
+      d3.select(`[data-link="${id} ${type} ${d.index}"]`)
+        .style("opacity", 0);
     });
 
   // left type
@@ -146,11 +183,20 @@ const createGraph = (id, type, graph, height) => {
     .selectAll()
     .data(links)
     .join("span")
+        .attr("data-link", d => {
+          if (type === 'left') {
+            return `${d.source.name} ${type} ${d.index}`;
+          } else {
+            return `${d.target.name} ${type} ${d.index}`;
+          }
+        })
         .style("width", "125px")
         .style("position", "absolute")
         .style("top", d => type === 'left' ? `${d.y1}px` : `${d.y0}px`)
         .style("left", type === 'left' ? `${width - 50}px` : `${44}px`)
-        .text(d => d.value);
+        .text(d => d.value)
+        .style('pointer-events', 'none')
+        .style("opacity",d => d.value < 100 ? 0 : 1);
 
   nodes.forEach(n => {
     // if (n.root) {
