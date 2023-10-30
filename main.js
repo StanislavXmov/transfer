@@ -9,6 +9,8 @@ import { filterFromRegionOutToLegueTop } from './filterFromRegionOutToLegueTop';
 import { filterFromLeagueTopOutInsideToRegion } from './filterFromLeagueTopOutInsideToRegion';
 import { filterToTopInInside } from './filterToTopInInside';
 import { filterFromTopOutInside } from './filterFromTopOutInside';
+import { filterByCountryToTop } from './filterByCountryToTop';
+import { filterByTopToCountry } from './filterByTopToCountry';
 
 const margin = {top: 10, right: 10, bottom: 10, left: 10};
 const width = 400 - margin.left - margin.right;
@@ -33,12 +35,12 @@ const getCsv = async () => {
 
   if (leftData.transfers > rightData.transfers) {
     const dh = rightData.transfers / leftData.transfers;
-    createGraph('#graphLeft', 'left', leftData, height);
-    createGraph('#graphRight', 'right', rightData, height * dh);
+    createGraph('#graphLeft', 'left', leftData, height, data);
+    createGraph('#graphRight', 'right', rightData, height * dh, data);
   } else {
     const dh = leftData.transfers / rightData.transfers;
-    createGraph('#graphRight', 'right', rightData, height);
-    createGraph('#graphLeft', 'left', leftData, height * dh);
+    createGraph('#graphRight', 'right', rightData, height, data);
+    createGraph('#graphLeft', 'left', leftData, height * dh, data);
   }
 
   onChangeElement.addEventListener('change', (e) => {
@@ -84,7 +86,7 @@ const cb = {
   }
 }
 
-const createGraph = (id, type, graph, height) => {
+const createGraph = (id, type, graph, height, data) => {
   const svg = d3.select(id).append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
@@ -102,6 +104,7 @@ const createGraph = (id, type, graph, height) => {
     nodes: graph.nodes.map(d => Object.assign({}, d)),
     links: graph.links.map(d => Object.assign({}, d))
   });
+  // console.log({nodes, links});
   
   const link = group.append("g")
   .attr("fill", "none")
@@ -157,6 +160,7 @@ const createGraph = (id, type, graph, height) => {
     .data(nodes)
     // .data(nodes.filter(n => n.index !== 0))
     .join("span")
+      .style("cursor", "pointer")
       .style("width", "125px")
       .style("position", "absolute")
       .style("top", d => `${d.y0 + 8}px`)
@@ -172,6 +176,20 @@ const createGraph = (id, type, graph, height) => {
             return `${d.x0 + 100}px`;
           } else {
             return `${d.x0 + 40}px`;
+          }
+        }
+      })
+      .on("click", (e, d) => {
+        if (!d.root) {
+          if (d.name === 'Europe') {
+            // console.log({e, d}, data);
+            const newLeftData = filterByCountryToTop(data, d.name);
+            clearGraph('#graphLeft', 'left');
+            createGraph('#graphLeft', 'left', newLeftData, 1000);
+          
+            const newRightData = filterByTopToCountry(data, d.name);
+            clearGraph('#graphRight', 'right');
+            createGraph('#graphRight', 'right', newRightData, 1600);
           }
         }
       })
