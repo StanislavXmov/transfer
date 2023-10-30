@@ -57,6 +57,5 @@ export const filterFromTopOutInside = (data) => {
       });
     }
   });
-  console.log({nodes, links, transfers});
   return {nodes, links, transfers};
 }
