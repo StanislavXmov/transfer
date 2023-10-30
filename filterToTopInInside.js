@@ -19,16 +19,6 @@ export const filterToTopInInside = (data) => {
   const toTopRegions = data.filter(d => d[toRegionField] === region);
   const transfers = toTopRegions.length;
 
-  // const r = {};
-  // data.reduce((prev, curr, i) => {
-  //   if (!r[curr[fromRegionField]]) {
-  //     r[curr[fromRegionField]] = {value: 1, title: curr[fromRegionField]}
-  //   } else {
-  //     r[curr[fromRegionField]].value += 1;
-  //   }
-  // }, r);
-  // console.log(r);
-
   const regions = {};
   toTopRegions.reduce((prev, curr, i) => {
     if (!regions[curr[fromRegionField]]) {
@@ -46,23 +36,27 @@ export const filterToTopInInside = (data) => {
   const nodes = [startNode];
   const links = [];
   
-  Object.keys(regions).forEach(key => {
-    const index = nodes.length;
-    regions[key].index = index;
-    nodes.push({
-      node: index,
-      name: regions[key].title,
-    });
+  regionsOrder.forEach(key => {
+    if (regions[key]) {
+      const index = nodes.length;
+      regions[key].index = index;
+      nodes.push({
+        node: index,
+        name: regions[key].title,
+      });
+    }
   });
 
-  Object.keys(regions).forEach(key => {
-    links.push({
-      source: regions[key].index,
-      target: 0,
-      value: regions[key].value,
-    });
+  regionsOrder.forEach(key => {
+    if (regions[key]) {
+      links.push({
+        source: regions[key].index,
+        target: 0,
+        value: regions[key].value,
+      });
+    }
   });
 
-  console.log({nodes, links, transfers});
+  // console.log({nodes, links, transfers});
   return {nodes, links, transfers};
 }

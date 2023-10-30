@@ -155,7 +155,7 @@ const createGraph = (id, type, graph, height) => {
         .text(d => d.value);
 
   nodes.forEach(n => {
-    if (n.root) {
+    // if (n.root) {
       group.append("g")
         .attr("stroke", "#000")
         .attr("stroke-opacity", 0.2)
@@ -165,7 +165,7 @@ const createGraph = (id, type, graph, height) => {
           .attr("height", n.y1 - n.y0)
           .attr("width", n.x1 - n.x0)
           .attr("fill", '#fff');
-    }
+    // }
   });
 }
 
