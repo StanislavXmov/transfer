@@ -1,3 +1,5 @@
+import { asiaLeft, europeLeft, northAmerica, southAmericaLeft } from "./order";
+
 export const filterByCountryToTop = (data, selectedRegion) => {
   const fromLevelField = 'From Level';
   const fromLeagueField = 'From League';
@@ -11,6 +13,19 @@ export const filterByCountryToTop = (data, selectedRegion) => {
   const insideType = 'Inside';
   const toRegionField = 'To Region';
   const pathField = '';
+
+  let order = []
+  if (selectedRegion === 'Europe, ex. Top Leagues') {
+    order = europeLeft;
+  } else if (selectedRegion === 'South America') {
+    order = southAmericaLeft;
+  } else if (selectedRegion === 'North America') {
+    order = northAmerica;
+  } else if (selectedRegion === 'No club') {
+    order = ['-'];
+  } else if (selectedRegion === 'Asia') {
+    order = asiaLeft;
+  }
 
   const filteredByType = data.filter(d => 
     d[pathField] === inType || d[pathField] === insideType);
@@ -26,7 +41,7 @@ export const filterByCountryToTop = (data, selectedRegion) => {
       countries[curr[fromCountryField]].value += 1;
     }
   }, countries);
-
+  console.log(countries);
   const startNode = {
     node: 0,
     name: 'Top',
@@ -35,21 +50,25 @@ export const filterByCountryToTop = (data, selectedRegion) => {
   const nodes = [startNode];
   const links = [];
 
-  Object.keys(countries).forEach(key => {
-    const index = nodes.length;
-    countries[key].index = index;
-    nodes.push({
-      node: index,
-      name: countries[key].title,
-    });
+  order.forEach(key => {
+    if (countries[key]) {
+      const index = nodes.length;
+      countries[key].index = index;
+      nodes.push({
+        node: index,
+        name: countries[key].title,
+      });
+    }
   });
 
-  Object.keys(countries).forEach(key => {
-    links.push({
-      source: countries[key].index,
-      target: 0,
-      value: countries[key].value,
-    });
+  order.forEach(key => {
+    if (countries[key]) {
+      links.push({
+        source: countries[key].index,
+        target: 0,
+        value: countries[key].value,
+      });
+    }
   });
 
   // console.log({nodes, links, transfers});

@@ -126,7 +126,7 @@ const createGraph = (id, type, graph, height, data) => {
     // });
     .on('mouseover', (e, d) => {
       d3.select(e.target).style("opacity", 0.8);
-      if (d.width > 100) {
+      if (d.width > 50) {
         return;
       }
       let id;
@@ -140,7 +140,7 @@ const createGraph = (id, type, graph, height, data) => {
     })
     .on('mouseout', (e, d) => {
       d3.select(e.target).style("opacity", 1);
-      if (d.width > 100) {
+      if (d.width > 50) {
         return;
       }
       let id;
@@ -191,7 +191,17 @@ const createGraph = (id, type, graph, height, data) => {
             
             if (newRightData.nodes.length > 10 || newLeftData.nodes.length > 10) {
               defaultHeight = 620 * 2;
-            }
+              const padding = 20;
+              if (newLeftData.transfers > newRightData.transfers) {
+                const dh = (d3.sum(newRightData.links.map(i => i.value + padding)) - padding) / (d3.sum(newLeftData.links.map(i => i.value + padding)) - padding);
+                createGraph('#graphLeft', 'left', newLeftData, defaultHeight, data);
+                createGraph('#graphRight', 'right', newRightData, defaultHeight * dh, data);
+              } else {
+                const dh = (d3.sum(newLeftData.links.map(i => i.value + padding)) - padding) / (d3.sum(newRightData.links.map(i => i.value + padding)) - padding);
+                createGraph('#graphRight', 'right', newRightData, defaultHeight, data);
+                createGraph('#graphLeft', 'left', newLeftData, defaultHeight * dh, data);
+              }
+            } else
             if (newLeftData.transfers > newRightData.transfers) {
               const dh = newRightData.transfers / newLeftData.transfers;
               createGraph('#graphLeft', 'left', newLeftData, defaultHeight, data);
@@ -224,7 +234,7 @@ const createGraph = (id, type, graph, height, data) => {
         .style("left", type === 'left' ? `${width - 50}px` : `${44}px`)
         .text(d => d.value)
         .style('pointer-events', 'none')
-        .style("opacity",d => d.width < 100 ? 0 : 1);
+        .style("opacity",d => d.width < 50 ? 0 : 1);
 
   nodes.forEach(n => {
     // if (n.root) {

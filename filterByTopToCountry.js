@@ -1,3 +1,5 @@
+import { asiaRight, europeRight, northAmerica, southAmericaRight } from "./order";
+
 export const filterByTopToCountry = (data, selectedRegion) => {
   const fromLevelField = 'From Level';
   const fromLeagueField = 'From League';
@@ -11,6 +13,19 @@ export const filterByTopToCountry = (data, selectedRegion) => {
   const insideType = 'Inside';
   const toRegionField = 'To Region';
   const pathField = '';
+  
+  let order = []
+  if (selectedRegion === 'Europe, ex. Top Leagues') {
+    order = europeRight;
+  } else if (selectedRegion === 'South America') {
+    order = southAmericaRight;
+  } else if (selectedRegion === 'North America') {
+    order = northAmerica;
+  } else if (selectedRegion === 'No club') {
+    order = ['-'];
+  } else if (selectedRegion === 'Asia') {
+    order = asiaRight;
+  }
 
   const filteredByType = data.filter(d => 
     d[pathField] === outType || d[pathField] === insideType);
@@ -27,7 +42,6 @@ export const filterByTopToCountry = (data, selectedRegion) => {
       countries[curr[toCountryField]].value += 1;
     }
   }, countries);
-  console.log(countries);
 
   const startNode = {
     node: 0,
@@ -37,21 +51,25 @@ export const filterByTopToCountry = (data, selectedRegion) => {
   const nodes = [startNode];
   const links = [];
 
-  Object.keys(countries).forEach(key => {
-    const index = nodes.length;
-    countries[key].index = index;
-    nodes.push({
-      node: index,
-      name: countries[key].title,
-    });
+  order.forEach(key => {
+    if (countries[key]) {
+      const index = nodes.length;
+      countries[key].index = index;
+      nodes.push({
+        node: index,
+        name: countries[key].title,
+      });
+    }
   });
 
-  Object.keys(countries).forEach(key => {
-    links.push({
-      source: 0,
-      target: countries[key].index,
-      value: countries[key].value,
-    });
+  order.forEach(key => {
+    if (countries[key]) {
+      links.push({
+        source: 0,
+        target: countries[key].index,
+        value: countries[key].value,
+      });
+    }
   });
 
   // console.log({nodes, links, transfers});
