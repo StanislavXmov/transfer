@@ -16,7 +16,7 @@ export const filterByTopToCountry = (data, selectedRegion) => {
     d[pathField] === outType || d[pathField] === insideType);
   
   const filteredByRegions = filteredByType.filter(d => 
-    d[fromRegionField] === region);
+    d[fromRegionField] === region && d[toRegionField] === selectedRegion);
   const transfers = filteredByRegions.length;
 
   const countries = {};
@@ -27,6 +27,7 @@ export const filterByTopToCountry = (data, selectedRegion) => {
       countries[curr[toCountryField]].value += 1;
     }
   }, countries);
+  console.log(countries);
 
   const startNode = {
     node: 0,

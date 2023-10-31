@@ -1,3 +1,5 @@
+import { regionsOrder } from "./order";
+
 export const filterFromRegionInInsideToLegueTop = (data) => {
   const fromLevelField = 'From Level';
   const fromLeagueField = 'From League';
@@ -9,15 +11,7 @@ export const filterFromRegionInInsideToLegueTop = (data) => {
   const insideType = 'Inside';
   const toRegionField = 'To Region';
   const pathField = '';
-  const regionsOrder = [
-    'Top', 
-    'Europe', 
-    'Asia', 
-    'Latin America', 
-    'US & Australia', 
-    'Africa', 
-    '-'
-  ];
+
   const leaguesOrder = [
     {key: 'Premier League, England', title: 'Premier League 🇬🇧'},
     {key: 'Bundesliga, German', title: 'Bundesliga 🇩🇪'},

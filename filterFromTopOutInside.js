@@ -1,3 +1,5 @@
+import { regionsOrder } from "./order";
+
 export const filterFromTopOutInside = (data) => {
   const region = 'Top';
   const fromRegionField = 'From Region';
@@ -6,15 +8,6 @@ export const filterFromTopOutInside = (data) => {
   const inType = 'In';
   const insideType = 'Inside';
   const pathField = '';
-  const regionsOrder = [
-    'Top', 
-    'Europe', 
-    'Asia', 
-    'Latin America', 
-    'US & Australia', 
-    'Africa', 
-    '-'
-  ];
 
   const fromTopRegions = data.filter(d => d[fromRegionField] === region);
   const transfers = fromTopRegions.length;

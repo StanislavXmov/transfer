@@ -126,7 +126,7 @@ const createGraph = (id, type, graph, height, data) => {
     // });
     .on('mouseover', (e, d) => {
       d3.select(e.target).style("opacity", 0.8);
-      if (d.value > 100) {
+      if (d.width > 100) {
         return;
       }
       let id;
@@ -140,7 +140,7 @@ const createGraph = (id, type, graph, height, data) => {
     })
     .on('mouseout', (e, d) => {
       d3.select(e.target).style("opacity", 1);
-      if (d.value > 100) {
+      if (d.width > 100) {
         return;
       }
       let id;
@@ -181,16 +181,26 @@ const createGraph = (id, type, graph, height, data) => {
       })
       .on("click", (e, d) => {
         if (!d.root) {
-          if (d.name === 'Europe') {
-            // console.log({e, d}, data);
-            const newLeftData = filterByCountryToTop(data, d.name);
+          // if (d.name === 'Europe') {
+            let defaultHeight = 620;
+            
             clearGraph('#graphLeft', 'left');
-            createGraph('#graphLeft', 'left', newLeftData, 1000);
-          
-            const newRightData = filterByTopToCountry(data, d.name);
             clearGraph('#graphRight', 'right');
-            createGraph('#graphRight', 'right', newRightData, 1600);
-          }
+            const newRightData = filterByTopToCountry(data, d.name);
+            const newLeftData = filterByCountryToTop(data, d.name);
+            
+            if (newRightData.nodes.length > 10 || newLeftData.nodes.length > 10) {
+              defaultHeight = 620 * 2;
+            }
+            if (newLeftData.transfers > newRightData.transfers) {
+              const dh = newRightData.transfers / newLeftData.transfers;
+              createGraph('#graphLeft', 'left', newLeftData, defaultHeight, data);
+              createGraph('#graphRight', 'right', newRightData, defaultHeight * dh, data);
+            } else {
+              const dh = newLeftData.transfers / newRightData.transfers;
+              createGraph('#graphRight', 'right', newRightData, defaultHeight, data);
+              createGraph('#graphLeft', 'left', newLeftData, defaultHeight * dh, data);
+            }
         }
       })
       .text(d => d.name);
@@ -214,7 +224,7 @@ const createGraph = (id, type, graph, height, data) => {
         .style("left", type === 'left' ? `${width - 50}px` : `${44}px`)
         .text(d => d.value)
         .style('pointer-events', 'none')
-        .style("opacity",d => d.value < 100 ? 0 : 1);
+        .style("opacity",d => d.width < 100 ? 0 : 1);
 
   nodes.forEach(n => {
     // if (n.root) {
