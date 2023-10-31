@@ -5,19 +5,42 @@
 body {
   margin: 0;
   padding: 16px;
-  min-width: 320px;
+  /* min-width: 1200px; */
   min-height: 100vh;
   font-family: sans-serif;
 }
 
 .title {
-  text-align: center;
+  text-align: left;
   margin: 0px
+}
+
+.titleWrapper {
+  margin-top: 32px;
+  display: grid;
+  grid-template-columns: 2fr 1fr 2fr;
+}
+
+.leftTitle {
+  padding-left: 142px;
+  text-align: left;
+}
+
+.middleTitle {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+
+.rightTitle {
+  padding-right: 142px;
+  text-align: right;
 }
 
 .container {
   margin: 16px auto 0;
-  width: 1016px;
+  width: 100%;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
@@ -28,11 +51,15 @@ body {
 }
 
 .graphLeft {
-  padding-left: 100px;
-  border: 1px dashed #0000002e;
+  /* padding-left: 100px; */
+  display: flex;
+  justify-content: center;
+  /* border: 1px dashed #0000002e; */
 }
 
 .graphRight {
-  padding-right: 100px;
-  border: 1px dashed #0000002e;
+  /* padding-right: 100px; */
+  display: flex;
+  justify-content: center;
+  /* border: 1px dashed #0000002e; */
 }

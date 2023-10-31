@@ -16,6 +16,9 @@ const margin = {top: 10, right: 10, bottom: 10, left: 10};
 const width = 400 - margin.left - margin.right;
 const height = 640 - margin.top - margin.bottom;
 const onChangeElement = document.getElementById('changeGraph');
+const signingElement = document.getElementById('signing');
+const outingElement = document.getElementById('outing');
+
 
 // Что происходит по клику в регион
 // 1. Если галочка снята (все лиги вместе), то 
@@ -33,6 +36,9 @@ const getCsv = async () => {
   const leftData = filterToTopInInside(data);
   const rightData = filterFromTopOutInside(data);
 
+  signingElement.textContent = leftData.transfers;
+  outingElement.textContent = rightData.transfers;
+
   if (leftData.transfers > rightData.transfers) {
     const dh = rightData.transfers / leftData.transfers;
     createGraph('#graphLeft', 'left', leftData, height, data);
@@ -49,6 +55,9 @@ const getCsv = async () => {
     if (e.target.checked) {
       const nextLeftData = filterFromRegionInInsideToLegueTop(data);
       const nextRightData = filterFromLeagueTopOutInsideToRegion(data);
+      signingElement.textContent = nextLeftData.transfers;
+      outingElement.textContent = nextRightData.transfers;
+
       if (nextLeftData.transfers > nextRightData.transfers) {
         const dh = nextRightData.transfers / nextLeftData.transfers;
         createGraph('#graphLeft', 'left', nextLeftData, height);
@@ -188,6 +197,8 @@ const createGraph = (id, type, graph, height, data) => {
             clearGraph('#graphRight', 'right');
             const newRightData = filterByTopToCountry(data, d.name);
             const newLeftData = filterByCountryToTop(data, d.name);
+            signingElement.textContent = newLeftData.transfers;
+            outingElement.textContent = newRightData.transfers;
             
             if (newRightData.nodes.length > 10 || newLeftData.nodes.length > 10) {
               defaultHeight = 620 * 2;

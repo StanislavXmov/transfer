@@ -9,6 +9,19 @@ export const regionsOrder = [
   'Retired'
 ];
 
+export const africa = [
+  'Algeria',
+  'Egypt'
+];
+
+export const top = [
+  'England',
+  'France',
+  'Germany',
+  'Italy',
+  'Spain'
+];
+
 export const europeLeft = [
   'France',
   'Spain',

@@ -1,4 +1,4 @@
-import { asiaLeft, europeLeft, northAmerica, southAmericaLeft } from "./order";
+import { africa, asiaLeft, europeLeft, northAmerica, southAmericaLeft, top } from "./order";
 
 export const filterByCountryToTop = (data, selectedRegion) => {
   const fromLevelField = 'From Level';
@@ -25,6 +25,10 @@ export const filterByCountryToTop = (data, selectedRegion) => {
     order = ['-'];
   } else if (selectedRegion === 'Asia') {
     order = asiaLeft;
+  } else if (selectedRegion === 'Africa') {
+    order = africa;
+  } else if (selectedRegion === 'Top') {
+    order = top;
   }
 
   const filteredByType = data.filter(d => 
