@@ -11,6 +11,7 @@ import { filterToTopInInside } from './filterToTopInInside';
 import { filterFromTopOutInside } from './filterFromTopOutInside';
 import { filterByCountryToTop } from './filterByCountryToTop';
 import { filterByTopToCountry } from './filterByTopToCountry';
+import { regionsOrder } from './order';
 
 const margin = {top: 10, right: 10, bottom: 10, left: 10};
 const width = 400 - margin.left - margin.right;
@@ -18,6 +19,10 @@ const height = 640 - margin.top - margin.bottom;
 const onChangeElement = document.getElementById('changeGraph');
 const signingElement = document.getElementById('signing');
 const outingElement = document.getElementById('outing');
+const signingFromElement = document.getElementById('signingFrom');
+const outingFromElement = document.getElementById('outingFrom');
+const filterButton = document.getElementById('filterButton');
+const filterButtonTitle = document.getElementById('filterButtonTitle');
 
 
 // Что происходит по клику в регион
@@ -52,6 +57,7 @@ const getCsv = async () => {
   onChangeElement.addEventListener('change', (e) => {
     clearGraph('#graphRight', 'right');
     clearGraph('#graphLeft', 'left');
+    filterButton.style.display = 'none';
     if (e.target.checked) {
       const nextLeftData = filterFromRegionInInsideToLegueTop(data);
       const nextRightData = filterFromLeagueTopOutInsideToRegion(data);
@@ -60,25 +66,44 @@ const getCsv = async () => {
 
       if (nextLeftData.transfers > nextRightData.transfers) {
         const dh = nextRightData.transfers / nextLeftData.transfers;
-        createGraph('#graphLeft', 'left', nextLeftData, height);
-        createGraph('#graphRight', 'right', nextRightData, height * dh);
+        createGraph('#graphLeft', 'left', nextLeftData, height, data);
+        createGraph('#graphRight', 'right', nextRightData, height * dh, data);
       } else {
         const dh = nextLeftData.transfers / nextRightData.transfers;
-        createGraph('#graphRight', 'right', nextRightData, height);
-        createGraph('#graphLeft', 'left', nextLeftData, height * dh);
+        createGraph('#graphRight', 'right', nextRightData, height, data);
+        createGraph('#graphLeft', 'left', nextLeftData, height * dh, data);
       }
     } else {
       if (leftData.transfers > rightData.transfers) {
         const dh = rightData.transfers / leftData.transfers;
-        createGraph('#graphLeft', 'left', leftData, height);
-        createGraph('#graphRight', 'right', rightData, height * dh);
+        createGraph('#graphLeft', 'left', leftData, height, data);
+        createGraph('#graphRight', 'right', rightData, height * dh, data);
       } else {
         const dh = leftData.transfers / rightData.transfers;
-        createGraph('#graphRight', 'right', rightData, height);
-        createGraph('#graphLeft', 'left', leftData, height * dh);
+        createGraph('#graphRight', 'right', rightData, height, data);
+        createGraph('#graphLeft', 'left', leftData, height * dh, data);
       }
     }
   });
+
+  filterButton.addEventListener('click', () => {
+    clearGraph('#graphRight', 'right');
+    clearGraph('#graphLeft', 'left');
+    signingElement.textContent = leftData.transfers;
+    outingElement.textContent = rightData.transfers;
+
+    if (leftData.transfers > rightData.transfers) {
+      const dh = rightData.transfers / leftData.transfers;
+      createGraph('#graphLeft', 'left', leftData, height, data);
+      createGraph('#graphRight', 'right', rightData, height * dh, data);
+    } else {
+      const dh = leftData.transfers / rightData.transfers;
+      createGraph('#graphRight', 'right', rightData, height, data);
+      createGraph('#graphLeft', 'left', leftData, height * dh, data);
+    }
+    filterButton.style.display = 'none';
+  });
+
 }
 
 getCsv();
@@ -172,16 +197,26 @@ const createGraph = (id, type, graph, height, data) => {
       .style("cursor", "pointer")
       .style("width", "125px")
       .style("position", "absolute")
-      .style("top", d => `${d.y0 + 8}px`)
+      .style("top", d => {
+        if (d.root && d.isLeagues) {
+          return `${(d.y0 + d.y1) / 2}px`;
+        } else {
+          return `${d.y0 + 8}px`;
+        }
+      })
       .style("left", d => {
         if (type === 'left') {
-          if (d.root) {
+          if (d.root && d.isLeagues) {
+            return `${370}px`;
+          } else if (d.root) {
             return `${d.x0 - 200}px`;
           } else {
             return `${d.x0 - 100}px`;
           }
         } else {
-          if (d.root) {
+          if (d.root && d.isLeagues) {
+            return `${10}px`;
+          } else if (d.root) {
             return `${d.x0 + 100}px`;
           } else {
             return `${d.x0 + 40}px`;
@@ -190,8 +225,10 @@ const createGraph = (id, type, graph, height, data) => {
       })
       .on("click", (e, d) => {
         if (!d.root) {
-          // if (d.name === 'Europe') {
+          if (regionsOrder.includes(d.name)) {
             let defaultHeight = 620;
+            filterButton.style.display = 'block';
+            filterButtonTitle.textContent = d.name;
             
             clearGraph('#graphLeft', 'left');
             clearGraph('#graphRight', 'right');
@@ -199,6 +236,8 @@ const createGraph = (id, type, graph, height, data) => {
             const newLeftData = filterByCountryToTop(data, d.name);
             signingElement.textContent = newLeftData.transfers;
             outingElement.textContent = newRightData.transfers;
+            signingFromElement.textContent = d.name;
+            outingFromElement.textContent = d.name;
             
             if (newRightData.nodes.length > 10 || newLeftData.nodes.length > 10) {
               defaultHeight = 620 * 2;
@@ -223,8 +262,20 @@ const createGraph = (id, type, graph, height, data) => {
               createGraph('#graphLeft', 'left', newLeftData, defaultHeight * dh, data);
             }
         }
+      }
       })
-      .text(d => d.name);
+      // .text(d => d.name);
+      .text(d => {
+        if (d.root) {
+          if (d.isLeagues) {
+            const icon = d.name.split(' ');
+            return icon[icon.length - 1];
+          }
+          return '';
+        } else {
+          return d.name;
+        }
+      });
     
       
   d3.select(id)

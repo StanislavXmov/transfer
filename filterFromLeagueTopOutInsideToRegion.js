@@ -45,6 +45,7 @@ export const filterFromLeagueTopOutInsideToRegion = (data) => {
         node: index,
         name: key.title,
         root: true,
+        isLeagues: true,
       });
       const regions = {};
       fromLeagues.reduce((prev, curr, i) => {

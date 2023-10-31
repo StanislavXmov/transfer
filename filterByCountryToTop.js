@@ -45,7 +45,7 @@ export const filterByCountryToTop = (data, selectedRegion) => {
       countries[curr[fromCountryField]].value += 1;
     }
   }, countries);
-  console.log(countries);
+  
   const startNode = {
     node: 0,
     name: 'Top',

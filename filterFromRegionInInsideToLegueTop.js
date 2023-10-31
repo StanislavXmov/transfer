@@ -61,7 +61,8 @@ export const filterFromRegionInInsideToLegueTop = (data) => {
           nodes.push({
             node: index,
             name: key.title,
-            root: true
+            root: true,
+            isLeagues: true,
           });
         }
       });
