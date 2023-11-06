@@ -72,3 +72,12 @@ body {
   border-radius: 8px;
   cursor: pointer;
 }
+
+#changeGraphLabel {
+  display: flex;
+  cursor: pointer;
+}
+
+#changeGraph {
+  cursor: pointer;
+}

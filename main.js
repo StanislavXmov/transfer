@@ -12,27 +12,19 @@ import { filterFromTopOutInside } from './filterFromTopOutInside';
 import { filterByCountryToTop } from './filterByCountryToTop';
 import { filterByTopToCountry } from './filterByTopToCountry';
 import { regionsOrder } from './order';
+import { filterFromCountryFromLeague, filterFromLeagueFromCountry } from './filterFromLeagueFromCountry';
 
 const margin = {top: 10, right: 10, bottom: 10, left: 10};
 const width = 400 - margin.left - margin.right;
 const height = 640 - margin.top - margin.bottom;
 const onChangeElement = document.getElementById('changeGraph');
+const changeGraphLabelElement = document.getElementById('changeGraphLabel');
 const signingElement = document.getElementById('signing');
 const outingElement = document.getElementById('outing');
 const signingFromElement = document.getElementById('signingFrom');
 const outingFromElement = document.getElementById('outingFrom');
 const filterButton = document.getElementById('filterButton');
 const filterButtonTitle = document.getElementById('filterButtonTitle');
-
-
-// Что происходит по клику в регион
-// 1. Если галочка снята (все лиги вместе), то 
-// слева From Country Filter Status == (in&inside) Region == (выбранный регион) To Top
-// справа From Top Status == (out&inside) To Country Region == (выбранный регион)
-
-// 2. Если галочка стоит (лиги отдельно), то 
-// слева From Country Filter Status == (in&inside) Region == (выбранный регион)  To League Filter Region == Top 
-// справа From League Region == Top, Status == (out&inside) To Country Region == (выбранный регион)
 
 const getCsv = async () => {
   const data = await d3.csv('./football-transfers.csv');
@@ -101,9 +93,10 @@ const getCsv = async () => {
       createGraph('#graphRight', 'right', rightData, height, data);
       createGraph('#graphLeft', 'left', leftData, height * dh, data);
     }
+    onChangeElement.disabled = false;
+    changeGraphLabelElement.style.opacity = 1;
     filterButton.style.display = 'none';
   });
-
 }
 
 getCsv();
@@ -111,13 +104,6 @@ getCsv();
 const clearGraph = (id, type) => {
   const el = document.querySelector(id);
   el.innerHTML = '';
-}
-
-const cb = {
-  next: () => {
-    clearGraph('#graphRight', 'right');
-    createGraph('#graphRight', 'right', graphNext);
-  }
 }
 
 const createGraph = (id, type, graph, height, data) => {
@@ -152,12 +138,6 @@ const createGraph = (id, type, graph, height, data) => {
     .attr("d", sankeyLinkHorizontal())
     .attr("stroke-width", d => Math.max(1, d.width))
     .style("cursor", "pointer")
-    // .on("click", (e, d) => {
-    //   console.log({e, d}, d.value);
-    //   if (cb[d.cb]) {
-    //     cb[d.cb]();
-    //   }
-    // });
     .on('mouseover', (e, d) => {
       d3.select(e.target).style("opacity", 0.8);
       if (d.width > 50) {
@@ -226,6 +206,9 @@ const createGraph = (id, type, graph, height, data) => {
       .on("click", (e, d) => {
         if (!d.root) {
           if (regionsOrder.includes(d.name)) {
+            onChangeElement.checked = false;
+            onChangeElement.disabled = true;
+            changeGraphLabelElement.style.opacity = 0.4;
             let defaultHeight = 620;
             filterButton.style.display = 'block';
             filterButtonTitle.textContent = d.name;
