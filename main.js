@@ -6,7 +6,7 @@ import './style.css';
 import { filterByCountryToTop } from './filterByCountryToTop';
 import { filterByTopToCountry } from './filterByTopToCountry';
 
-import { regionsOrder } from './order';
+import { countries, europeLeft, europeRight, regionsOrder } from './order';
 import { toTopInInside } from './filter/toTopInInside';
 import { fromTopOutInside } from './filter/fromTopOutInside';
 import { fromRegionInInsideToLegueTop } from './filter/fromRegionInInsideToLegueTop';
@@ -28,6 +28,19 @@ const graphLeftId = '#graphLeft';
 const left = 'left';
 const graphRightId = '#graphRight';
 const right = 'right';
+
+const createGraphsWithMoreNodes = (leftData, rightData, newHeight, data) => {
+  const padding = 20;
+  if (leftData.transfers > rightData.transfers) {
+    const dh = (d3.sum(rightData.links.map(i => i.value + padding)) - padding) / (d3.sum(leftData.links.map(i => i.value + padding)) - padding);
+    createGraph(graphLeftId, left, leftData, newHeight, data);
+    createGraph(graphRightId, right, rightData, newHeight * dh, data);
+  } else {
+    const dh = (d3.sum(leftData.links.map(i => i.value + padding)) - padding) / (d3.sum(rightData.links.map(i => i.value + padding)) - padding);
+    createGraph(graphRightId, right, rightData, newHeight, data);
+    createGraph(graphLeftId, left, leftData, newHeight * dh, data);
+  }
+}
 const createGraphs = (leftData, rightData, data) => {
   clearGraph(graphRightId, right);
   clearGraph(graphLeftId, left);
@@ -198,27 +211,13 @@ const createGraph = (id, type, graph, height, data) => {
             
             if (newRightData.nodes.length > 10 || newLeftData.nodes.length > 10) {
               defaultHeight = 620 * 2;
-              const padding = 20;
-              if (newLeftData.transfers > newRightData.transfers) {
-                const dh = (d3.sum(newRightData.links.map(i => i.value + padding)) - padding) / (d3.sum(newLeftData.links.map(i => i.value + padding)) - padding);
-                createGraph('#graphLeft', 'left', newLeftData, defaultHeight, data);
-                createGraph('#graphRight', 'right', newRightData, defaultHeight * dh, data);
-              } else {
-                const dh = (d3.sum(newLeftData.links.map(i => i.value + padding)) - padding) / (d3.sum(newRightData.links.map(i => i.value + padding)) - padding);
-                createGraph('#graphRight', 'right', newRightData, defaultHeight, data);
-                createGraph('#graphLeft', 'left', newLeftData, defaultHeight * dh, data);
-              }
-            } else
-            if (newLeftData.transfers > newRightData.transfers) {
-              const dh = newRightData.transfers / newLeftData.transfers;
-              createGraph('#graphLeft', 'left', newLeftData, defaultHeight, data);
-              createGraph('#graphRight', 'right', newRightData, defaultHeight * dh, data);
+              createGraphsWithMoreNodes(newLeftData, newRightData, defaultHeight, data);
             } else {
-              const dh = newLeftData.transfers / newRightData.transfers;
-              createGraph('#graphRight', 'right', newRightData, defaultHeight, data);
-              createGraph('#graphLeft', 'left', newLeftData, defaultHeight * dh, data);
-            }
-        }
+              createGraphs(newLeftData, newRightData, data);
+            } 
+          } else if (countries.has(d.name)) {
+            console.log(d.name);
+          }
       }
       })
       // .text(d => d.name);

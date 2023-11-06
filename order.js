@@ -131,6 +131,16 @@ export const northAmerica = [
   'Jamaica'
 ];
 
+export const countries = new Set();
+top.forEach(c => countries.add(c));
+europeLeft.forEach(c => countries.add(c));
+europeRight.forEach(c => countries.add(c));
+asiaLeft.forEach(c => countries.add(c));
+asiaRight.forEach(c => countries.add(c));
+southAmericaLeft.forEach(c => countries.add(c));
+southAmericaRight.forEach(c => countries.add(c));
+northAmerica.forEach(c => countries.add(c));
+
 export const leaguesOrder = [
   {key: 'Premier League, England', title: 'Premier League 🇬🇧'},
   {key: 'Bundesliga, German', title: 'Bundesliga 🇩🇪'},
