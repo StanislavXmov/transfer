@@ -2,17 +2,13 @@ import * as d3 from 'd3';
 import { sankey, sankeyLinkHorizontal, sankeyLeft } from 'd3-sankey';
 import './style.css';
 
-import { graph1, graph2, graphNext} from './data';
-import { filterFromTopToRegion } from './filterFromTopToRegion';
 import { filterFromRegionInInsideToLegueTop } from './filterFromRegionInInsideToLegueTop';
-import { filterFromRegionOutToLegueTop } from './filterFromRegionOutToLegueTop';
 import { filterFromLeagueTopOutInsideToRegion } from './filterFromLeagueTopOutInsideToRegion';
 import { filterToTopInInside } from './filterToTopInInside';
 import { filterFromTopOutInside } from './filterFromTopOutInside';
 import { filterByCountryToTop } from './filterByCountryToTop';
 import { filterByTopToCountry } from './filterByTopToCountry';
 import { regionsOrder } from './order';
-import { filterFromCountryFromLeague, filterFromLeagueFromCountry } from './filterFromLeagueFromCountry';
 
 const margin = {top: 10, right: 10, bottom: 10, left: 10};
 const width = 400 - margin.left - margin.right;
@@ -26,6 +22,27 @@ const outingFromElement = document.getElementById('outingFrom');
 const filterButton = document.getElementById('filterButton');
 const filterButtonTitle = document.getElementById('filterButtonTitle');
 
+const graphLeftId = '#graphLeft';
+const left = 'left';
+const graphRightId = '#graphRight';
+const right = 'right';
+const createGraphs = (leftData, rightData, data) => {
+  clearGraph(graphRightId, right);
+  clearGraph(graphLeftId, left);
+  signingElement.textContent = leftData.transfers;
+  outingElement.textContent = rightData.transfers;
+
+  if (leftData.transfers > rightData.transfers) {
+    const dh = rightData.transfers / leftData.transfers;
+    createGraph(graphLeftId, left, leftData, height, data);
+    createGraph(graphRightId, right, rightData, height * dh, data);
+  } else {
+    const dh = leftData.transfers / rightData.transfers;
+    createGraph(graphRightId, right, rightData, height, data);
+    createGraph(graphLeftId, left, leftData, height * dh, data);
+  }
+}
+
 const getCsv = async () => {
   const data = await d3.csv('./football-transfers.csv');
   console.log(data);
@@ -33,66 +50,21 @@ const getCsv = async () => {
   const leftData = filterToTopInInside(data);
   const rightData = filterFromTopOutInside(data);
 
-  signingElement.textContent = leftData.transfers;
-  outingElement.textContent = rightData.transfers;
-
-  if (leftData.transfers > rightData.transfers) {
-    const dh = rightData.transfers / leftData.transfers;
-    createGraph('#graphLeft', 'left', leftData, height, data);
-    createGraph('#graphRight', 'right', rightData, height * dh, data);
-  } else {
-    const dh = leftData.transfers / rightData.transfers;
-    createGraph('#graphRight', 'right', rightData, height, data);
-    createGraph('#graphLeft', 'left', leftData, height * dh, data);
-  }
+  createGraphs(leftData, rightData, data);
 
   onChangeElement.addEventListener('change', (e) => {
-    clearGraph('#graphRight', 'right');
-    clearGraph('#graphLeft', 'left');
     filterButton.style.display = 'none';
     if (e.target.checked) {
       const nextLeftData = filterFromRegionInInsideToLegueTop(data);
       const nextRightData = filterFromLeagueTopOutInsideToRegion(data);
-      signingElement.textContent = nextLeftData.transfers;
-      outingElement.textContent = nextRightData.transfers;
-
-      if (nextLeftData.transfers > nextRightData.transfers) {
-        const dh = nextRightData.transfers / nextLeftData.transfers;
-        createGraph('#graphLeft', 'left', nextLeftData, height, data);
-        createGraph('#graphRight', 'right', nextRightData, height * dh, data);
-      } else {
-        const dh = nextLeftData.transfers / nextRightData.transfers;
-        createGraph('#graphRight', 'right', nextRightData, height, data);
-        createGraph('#graphLeft', 'left', nextLeftData, height * dh, data);
-      }
+      createGraphs(nextLeftData, nextRightData, data);
     } else {
-      if (leftData.transfers > rightData.transfers) {
-        const dh = rightData.transfers / leftData.transfers;
-        createGraph('#graphLeft', 'left', leftData, height, data);
-        createGraph('#graphRight', 'right', rightData, height * dh, data);
-      } else {
-        const dh = leftData.transfers / rightData.transfers;
-        createGraph('#graphRight', 'right', rightData, height, data);
-        createGraph('#graphLeft', 'left', leftData, height * dh, data);
-      }
+      createGraphs(leftData, rightData, data);
     }
   });
 
   filterButton.addEventListener('click', () => {
-    clearGraph('#graphRight', 'right');
-    clearGraph('#graphLeft', 'left');
-    signingElement.textContent = leftData.transfers;
-    outingElement.textContent = rightData.transfers;
-
-    if (leftData.transfers > rightData.transfers) {
-      const dh = rightData.transfers / leftData.transfers;
-      createGraph('#graphLeft', 'left', leftData, height, data);
-      createGraph('#graphRight', 'right', rightData, height * dh, data);
-    } else {
-      const dh = leftData.transfers / rightData.transfers;
-      createGraph('#graphRight', 'right', rightData, height, data);
-      createGraph('#graphLeft', 'left', leftData, height * dh, data);
-    }
+    createGraphs(leftData, rightData, data);
     onChangeElement.disabled = false;
     changeGraphLabelElement.style.opacity = 1;
     filterButton.style.display = 'none';
