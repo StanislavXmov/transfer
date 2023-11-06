@@ -30,6 +30,8 @@ const graphRightId = '#graphRight';
 const right = 'right';
 
 const createGraphsWithMoreNodes = (leftData, rightData, newHeight, data) => {
+  clearGraph(graphRightId, right);
+  clearGraph(graphLeftId, left);
   const padding = 20;
   if (leftData.transfers > rightData.transfers) {
     const dh = (d3.sum(rightData.links.map(i => i.value + padding)) - padding) / (d3.sum(leftData.links.map(i => i.value + padding)) - padding);
@@ -56,6 +58,29 @@ const createGraphs = (leftData, rightData, data) => {
     createGraph(graphRightId, right, rightData, height, data);
     createGraph(graphLeftId, left, leftData, height * dh, data);
   }
+}
+
+const showRegionsGraphs = (data, node) => {
+  onChangeElement.checked = false;
+  onChangeElement.disabled = true;
+  changeGraphLabelElement.style.opacity = 0.4;
+  let defaultHeight = 620;
+  filterButton.style.display = 'block';
+  filterButtonTitle.textContent = node.name;
+
+  const newRightData = filterByTopToCountry(data, node.name);
+  const newLeftData = filterByCountryToTop(data, node.name);
+  signingElement.textContent = newLeftData.transfers;
+  outingElement.textContent = newRightData.transfers;
+  signingFromElement.textContent = node.name;
+  outingFromElement.textContent = node.name;
+  
+  if (newRightData.nodes.length > 10 || newLeftData.nodes.length > 10) {
+    defaultHeight = 620 * 2;
+    createGraphsWithMoreNodes(newLeftData, newRightData, defaultHeight, data);
+  } else {
+    createGraphs(newLeftData, newRightData, data);
+  } 
 }
 
 const getCsv = async () => {
@@ -193,28 +218,7 @@ const createGraph = (id, type, graph, height, data) => {
       .on("click", (e, d) => {
         if (!d.root) {
           if (regionsOrder.includes(d.name)) {
-            onChangeElement.checked = false;
-            onChangeElement.disabled = true;
-            changeGraphLabelElement.style.opacity = 0.4;
-            let defaultHeight = 620;
-            filterButton.style.display = 'block';
-            filterButtonTitle.textContent = d.name;
-            
-            clearGraph('#graphLeft', 'left');
-            clearGraph('#graphRight', 'right');
-            const newRightData = filterByTopToCountry(data, d.name);
-            const newLeftData = filterByCountryToTop(data, d.name);
-            signingElement.textContent = newLeftData.transfers;
-            outingElement.textContent = newRightData.transfers;
-            signingFromElement.textContent = d.name;
-            outingFromElement.textContent = d.name;
-            
-            if (newRightData.nodes.length > 10 || newLeftData.nodes.length > 10) {
-              defaultHeight = 620 * 2;
-              createGraphsWithMoreNodes(newLeftData, newRightData, defaultHeight, data);
-            } else {
-              createGraphs(newLeftData, newRightData, data);
-            } 
+            showRegionsGraphs(data, d);
           } else if (countries.has(d.name)) {
             console.log(d.name);
           }
