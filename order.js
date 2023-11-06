@@ -130,3 +130,11 @@ export const northAmerica = [
   'Mexico',
   'Jamaica'
 ];
+
+export const leaguesOrder = [
+  {key: 'Premier League, England', title: 'Premier League 🇬🇧'},
+  {key: 'Bundesliga, German', title: 'Bundesliga 🇩🇪'},
+  {key: 'LaLiga, Spain', title: 'LaLiga 🇪🇸'},
+  {key: 'Serie A, Italy', title: 'Serie A 🇮🇹'},
+  {key: 'Ligue 1, France', title: 'Ligue 1 🇫🇷'}
+];

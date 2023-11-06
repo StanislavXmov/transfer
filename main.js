@@ -1,14 +1,16 @@
 import * as d3 from 'd3';
-import { sankey, sankeyLinkHorizontal, sankeyLeft } from 'd3-sankey';
+import { sankey, sankeyLinkHorizontal } from 'd3-sankey';
 import './style.css';
 
-import { filterFromRegionInInsideToLegueTop } from './filterFromRegionInInsideToLegueTop';
-import { filterFromLeagueTopOutInsideToRegion } from './filterFromLeagueTopOutInsideToRegion';
-import { filterToTopInInside } from './filterToTopInInside';
-import { filterFromTopOutInside } from './filterFromTopOutInside';
+
 import { filterByCountryToTop } from './filterByCountryToTop';
 import { filterByTopToCountry } from './filterByTopToCountry';
+
 import { regionsOrder } from './order';
+import { toTopInInside } from './filter/toTopInInside';
+import { fromTopOutInside } from './filter/fromTopOutInside';
+import { fromRegionInInsideToLegueTop } from './filter/fromRegionInInsideToLegueTop';
+import { fromLeagueTopOutInsideToRegion } from './filter/fromLeagueTopOutInsideToRegion';
 
 const margin = {top: 10, right: 10, bottom: 10, left: 10};
 const width = 400 - margin.left - margin.right;
@@ -47,16 +49,16 @@ const getCsv = async () => {
   const data = await d3.csv('./football-transfers.csv');
   console.log(data);
 
-  const leftData = filterToTopInInside(data);
-  const rightData = filterFromTopOutInside(data);
+  const leftData = toTopInInside(data);
+  const rightData = fromTopOutInside(data);
 
   createGraphs(leftData, rightData, data);
 
   onChangeElement.addEventListener('change', (e) => {
     filterButton.style.display = 'none';
     if (e.target.checked) {
-      const nextLeftData = filterFromRegionInInsideToLegueTop(data);
-      const nextRightData = filterFromLeagueTopOutInsideToRegion(data);
+      const nextLeftData = fromRegionInInsideToLegueTop(data);
+      const nextRightData = fromLeagueTopOutInsideToRegion(data);
       createGraphs(nextLeftData, nextRightData, data);
     } else {
       createGraphs(leftData, rightData, data);
