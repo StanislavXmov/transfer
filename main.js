@@ -12,6 +12,9 @@ import { fromTopOutInside } from './filter/fromTopOutInside';
 import { fromRegionInInsideToLegueTop } from './filter/fromRegionInInsideToLegueTop';
 import { fromLeagueTopOutInsideToRegion } from './filter/fromLeagueTopOutInsideToRegion';
 
+import { fromCountryFromLeague } from './filter/countries/fromCountryFromLeague';
+import { fromLeagueToCountry } from './filter/countries/fromLeagueToCountry';
+
 const margin = {top: 10, right: 10, bottom: 10, left: 10};
 const width = 400 - margin.left - margin.right;
 const height = 640 - margin.top - margin.bottom;
@@ -220,7 +223,11 @@ const createGraph = (id, type, graph, height, data) => {
           if (regionsOrder.includes(d.name)) {
             showRegionsGraphs(data, d);
           } else if (countries.has(d.name)) {
-            console.log(d.name);
+            // test
+            let defaultHeight = 620;
+            const newLeftData = fromCountryFromLeague(data, d.name);
+            const newRightData = fromLeagueToCountry(data, d.name);
+            createGraphs(newLeftData, newRightData, data);
           }
       }
       })
