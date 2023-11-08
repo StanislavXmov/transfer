@@ -24,8 +24,12 @@ const signingElement = document.getElementById('signing');
 const outingElement = document.getElementById('outing');
 const signingFromElement = document.getElementById('signingFrom');
 const outingFromElement = document.getElementById('outingFrom');
-const filterButton = document.getElementById('filterButton');
-const filterButtonTitle = document.getElementById('filterButtonTitle');
+
+const filterStep1Button = document.getElementById('filterStep1Button');
+const filterStep1ButtonTitle = document.getElementById('filterStep1ButtonTitle');
+
+const filterStep2Button = document.getElementById('filterStep2Button');
+const filterStep2ButtonTitle = document.getElementById('filterStep2ButtonTitle');
 
 const graphLeftId = '#graphLeft';
 const left = 'left';
@@ -68,15 +72,31 @@ const showRegionsGraphs = (data, node) => {
   onChangeElement.disabled = true;
   changeGraphLabelElement.style.opacity = 0.4;
   let defaultHeight = 620;
-  filterButton.style.display = 'block';
-  filterButtonTitle.textContent = node.name;
+  filterStep1Button.style.display = 'block';
+  filterStep1ButtonTitle.textContent = node.name;
 
-  const newRightData = filterByTopToCountry(data, node.name);
-  const newLeftData = filterByCountryToTop(data, node.name);
+  let newRightData, newLeftData; 
+  if (datas.regions && datas.regions[node.name]) {
+    newRightData = datas.regions[node.name].right;
+    newLeftData = datas.regions[node.name].left;
+  } else {
+    if (!datas.regions) {
+      datas.regions = {};
+    }
+    newLeftData = filterByCountryToTop(data, node.name);
+    newRightData = filterByTopToCountry(data, node.name);
+    
+    datas.regions[node.name] = {};
+    datas.regions[node.name].left = newLeftData;
+    datas.regions[node.name].right = newRightData;
+  }
+
   signingElement.textContent = newLeftData.transfers;
   outingElement.textContent = newRightData.transfers;
   signingFromElement.textContent = node.name;
   outingFromElement.textContent = node.name;
+
+  filterStep1Button.dataset.regions = node.name;
   
   if (newRightData.nodes.length > 10 || newLeftData.nodes.length > 10) {
     defaultHeight = 620 * 2;
@@ -86,6 +106,44 @@ const showRegionsGraphs = (data, node) => {
   } 
 }
 
+const showCountriesGraphs = (data, node) => {
+  onChangeElement.checked = false;
+  onChangeElement.disabled = true;
+  changeGraphLabelElement.style.opacity = 0.4;
+
+  filterStep2Button.style.display = 'block';
+  filterStep2ButtonTitle.textContent = node.name;
+
+  let newRightData, newLeftData; 
+  if (datas.countries && datas.countries[node.name]) {
+    newRightData = datas.countries[node.name].right;
+    newLeftData = datas.countries[node.name].left;
+  } else {
+    if (!datas.countries) {
+      datas.countries = {};
+    }
+    
+    newLeftData = fromCountryFromLeague(data, node.name);
+    newRightData = fromLeagueToCountry(data, node.name);
+
+    datas.countries[node.name] = {};
+    datas.countries[node.name].left = newLeftData;
+    datas.countries[node.name].right = newRightData;
+  }
+
+  signingElement.textContent = newLeftData.transfers;
+  outingElement.textContent = newRightData.transfers;
+  signingFromElement.textContent = node.name;
+  outingFromElement.textContent = node.name;
+
+  filterStep2Button.dataset.country = node.name;
+
+  createGraphs(newLeftData, newRightData, data);
+}
+
+const datas = {};
+console.log(datas);
+
 const getCsv = async () => {
   const data = await d3.csv('./football-transfers.csv');
   console.log(data);
@@ -93,10 +151,14 @@ const getCsv = async () => {
   const leftData = toTopInInside(data);
   const rightData = fromTopOutInside(data);
 
+  datas.top = {};
+  datas.top.left = leftData;
+  datas.top.right = rightData;
+
   createGraphs(leftData, rightData, data);
 
   onChangeElement.addEventListener('change', (e) => {
-    filterButton.style.display = 'none';
+    filterStep1Button.style.display = 'none';
     if (e.target.checked) {
       const nextLeftData = fromRegionInInsideToLegueTop(data);
       const nextRightData = fromLeagueTopOutInsideToRegion(data);
@@ -106,11 +168,19 @@ const getCsv = async () => {
     }
   });
 
-  filterButton.addEventListener('click', () => {
-    createGraphs(leftData, rightData, data);
+  filterStep1Button.addEventListener('click', () => {
+    createGraphs(datas.top.left, datas.top.right, data);
     onChangeElement.disabled = false;
     changeGraphLabelElement.style.opacity = 1;
-    filterButton.style.display = 'none';
+    filterStep1Button.style.display = 'none';
+    filterStep2Button.style.display = 'none';
+  });
+
+  filterStep2Button.addEventListener('click', () => {
+    showRegionsGraphs(data, {name: filterStep1Button.dataset.regions});
+    onChangeElement.disabled = false;
+    changeGraphLabelElement.style.opacity = 1;
+    filterStep2Button.style.display = 'none';
   });
 }
 
@@ -224,10 +294,7 @@ const createGraph = (id, type, graph, height, data) => {
             showRegionsGraphs(data, d);
           } else if (countries.has(d.name)) {
             // test
-            let defaultHeight = 620;
-            const newLeftData = fromCountryFromLeague(data, d.name);
-            const newRightData = fromLeagueToCountry(data, d.name);
-            createGraphs(newLeftData, newRightData, data);
+            showCountriesGraphs(data, d);
           }
       }
       })
