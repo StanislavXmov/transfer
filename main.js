@@ -263,14 +263,12 @@ const createGraph = (id, type, graph, height, data) => {
       .style("width", "200px")
       .style("position", "absolute")
       .style("line-height", d => {
-        console.log(d);
         if (d.value < 10) {
           return "12px";
         }
         return "14px";
       })
       .style("font-size", d => {
-        console.log(d);
         if (d.value < 10) {
           return "12px";
         }

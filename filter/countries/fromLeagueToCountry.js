@@ -5,10 +5,11 @@ export const fromLeagueToCountry = (data, country) => {
   const filteredByType = data.filter(d => 
     d[typeField] === outType || d[typeField] === insideType);
   const filteredByCountry = filteredByType.filter(d => 
-    d[fromRegionField] === region 
+    // d[fromRegionField] === region 
+    d[toRegionField] === regionEurope
     && d[toCountryField] === country 
     // test
-    && d[toRegionField] !== regionEurope
+    // && d[toRegionField] !== regionEurope
   );
   const transfers = filteredByCountry.length;
 
