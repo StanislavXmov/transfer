@@ -260,8 +260,22 @@ const createGraph = (id, type, graph, height, data) => {
     // .data(nodes.filter(n => n.index !== 0))
     .join("span")
       .style("cursor", "pointer")
-      .style("width", "125px")
+      .style("width", "200px")
       .style("position", "absolute")
+      .style("line-height", d => {
+        console.log(d);
+        if (d.value < 10) {
+          return "12px";
+        }
+        return "14px";
+      })
+      .style("font-size", d => {
+        console.log(d);
+        if (d.value < 10) {
+          return "12px";
+        }
+        return "16px";
+      })
       .style("top", d => {
         if (d.root && d.isLeagues) {
           return `${(d.y0 + d.y1) / 2}px`;
@@ -276,7 +290,7 @@ const createGraph = (id, type, graph, height, data) => {
           } else if (d.root) {
             return `${d.x0 - 200}px`;
           } else {
-            return `${d.x0 - 100}px`;
+            return `${d.x0 - 200}px`;
           }
         } else {
           if (d.root && d.isLeagues) {
@@ -285,6 +299,25 @@ const createGraph = (id, type, graph, height, data) => {
             return `${d.x0 + 100}px`;
           } else {
             return `${d.x0 + 40}px`;
+          }
+        }
+      })
+      .style("text-align", d => {
+        if (type === 'left') {
+          if (d.root && d.isLeagues) {
+            return ``;
+          } else if (d.root) {
+            return ``;
+          } else {
+            return `right`;
+          }
+        } else {
+          if (d.root && d.isLeagues) {
+            return ``;
+          } else if (d.root) {
+            return ``;
+          } else {
+            return ``;
           }
         }
       })

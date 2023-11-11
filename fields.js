@@ -37,3 +37,4 @@ export const inType = 'In';
 export const insideType = 'Inside';
 
 export const region = 'Top';
+export const regionEurope = 'Europe, ex. Top Leagues';

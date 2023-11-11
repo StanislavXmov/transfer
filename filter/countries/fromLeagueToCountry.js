@@ -1,11 +1,15 @@
-import { fromRegionField, insideType, outType, region, toCountryField, toLeagueField, typeField } from "../../fields";
+import { fromRegionField, insideType, outType, region, regionEurope, toCountryField, toLeagueField, toRegionField, typeField } from "../../fields";
 
 export const fromLeagueToCountry = (data, country) => {
 
   const filteredByType = data.filter(d => 
     d[typeField] === outType || d[typeField] === insideType);
   const filteredByCountry = filteredByType.filter(d => 
-    d[fromRegionField] === region && d[toCountryField] === country);
+    d[fromRegionField] === region 
+    && d[toCountryField] === country 
+    // test
+    && d[toRegionField] !== regionEurope
+  );
   const transfers = filteredByCountry.length;
 
   const leagues = {};
