@@ -106,7 +106,7 @@ const showRegionsGraphs = (data, node) => {
   } 
 }
 
-const showCountriesGraphs = (data, node) => {
+const showCountriesGraphs = (data, node, firstFilter) => {
   onChangeElement.checked = false;
   onChangeElement.disabled = true;
   changeGraphLabelElement.style.opacity = 0.4;
@@ -123,8 +123,8 @@ const showCountriesGraphs = (data, node) => {
       datas.countries = {};
     }
     
-    newLeftData = fromCountryFromLeague(data, node.name);
-    newRightData = fromLeagueToCountry(data, node.name);
+    newLeftData = fromCountryFromLeague(data, node.name, firstFilter);
+    newRightData = fromLeagueToCountry(data, node.name, firstFilter);
 
     datas.countries[node.name] = {};
     datas.countries[node.name].left = newLeftData;
@@ -143,6 +143,7 @@ const showCountriesGraphs = (data, node) => {
 
 const datas = {};
 console.log(datas);
+let firstFilter = null;
 
 const getCsv = async () => {
   const data = await d3.csv('./football-transfers.csv');
@@ -322,10 +323,11 @@ const createGraph = (id, type, graph, height, data) => {
       .on("click", (e, d) => {
         if (!d.root) {
           if (regionsOrder.includes(d.name)) {
+            firstFilter = d.name;
             showRegionsGraphs(data, d);
           } else if (countries.has(d.name)) {
             // test
-            showCountriesGraphs(data, d);
+            showCountriesGraphs(data, d, firstFilter);
           }
       }
       })
