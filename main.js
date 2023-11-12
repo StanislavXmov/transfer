@@ -14,6 +14,8 @@ import { fromLeagueTopOutInsideToRegion } from './filter/fromLeagueTopOutInsideT
 
 import { fromCountryFromLeague } from './filter/countries/fromCountryFromLeague';
 import { fromLeagueToCountry } from './filter/countries/fromLeagueToCountry';
+import { fromCountries } from './filter/checked/fromCountries';
+import { toCountries } from './filter/checked/toCountries';
 
 const margin = {top: 10, right: 10, bottom: 10, left: 10};
 const width = 400 - margin.left - margin.right;
@@ -69,8 +71,10 @@ const createGraphs = (leftData, rightData, data) => {
 
 const showRegionsGraphs = (data, node) => {
   onChangeElement.checked = false;
-  onChangeElement.disabled = true;
-  changeGraphLabelElement.style.opacity = 0.4;
+
+  // onChangeElement.disabled = true;
+  // changeGraphLabelElement.style.opacity = 0.4;
+
   let defaultHeight = 620;
   filterStep1Button.style.display = 'block';
   filterStep1ButtonTitle.textContent = node.name;
@@ -108,8 +112,9 @@ const showRegionsGraphs = (data, node) => {
 
 const showCountriesGraphs = (data, node, firstFilter) => {
   onChangeElement.checked = false;
-  onChangeElement.disabled = true;
-  changeGraphLabelElement.style.opacity = 0.4;
+
+  // onChangeElement.disabled = true;
+  // changeGraphLabelElement.style.opacity = 0.4;
 
   filterStep2Button.style.display = 'block';
   filterStep2ButtonTitle.textContent = node.name;
@@ -141,9 +146,20 @@ const showCountriesGraphs = (data, node, firstFilter) => {
   createGraphs(newLeftData, newRightData, data);
 }
 
+const showCountriesByLeagues = (leftData, rightData, data) => {
+  let defaultHeight = 620;
+  if (rightData.nodes.length > 10 || leftData.nodes.length > 10) {
+    defaultHeight = 620 * 2;
+    createGraphsWithMoreNodes(leftData, rightData, defaultHeight, data);
+  } else {
+    createGraphs(leftData, rightData, data);
+  } 
+}
+
 const datas = {};
 console.log(datas);
 let firstFilter = null;
+let secondFilter = null;
 
 const getCsv = async () => {
   const data = await d3.csv('./football-transfers.csv');
@@ -159,14 +175,30 @@ const getCsv = async () => {
   createGraphs(leftData, rightData, data);
 
   onChangeElement.addEventListener('change', (e) => {
-    filterStep1Button.style.display = 'none';
-    if (e.target.checked) {
-      const nextLeftData = fromRegionInInsideToLegueTop(data);
-      const nextRightData = fromLeagueTopOutInsideToRegion(data);
-      createGraphs(nextLeftData, nextRightData, data);
-    } else {
-      createGraphs(leftData, rightData, data);
+    
+    if (!firstFilter) {
+      filterStep1Button.style.display = 'none';
+      if (e.target.checked) {
+        const nextLeftData = fromRegionInInsideToLegueTop(data);
+        const nextRightData = fromLeagueTopOutInsideToRegion(data);
+        createGraphs(nextLeftData, nextRightData, data);
+      } else {
+        createGraphs(leftData, rightData, data);
+      }
+    } else if (secondFilter) {
+      // console.log({secondFilter});
+
+    } else if (firstFilter) {
+      // console.log({firstFilter});
+      if (e.target.checked) {
+        const nextLeftData = fromCountries(data, firstFilter);
+        const nextRightData = toCountries(data, firstFilter);
+        showCountriesByLeagues(nextLeftData, nextRightData,  data);
+      } else {
+        showRegionsGraphs(data, {name: firstFilter});
+      }
     }
+    
   });
 
   filterStep1Button.addEventListener('click', () => {
@@ -175,6 +207,8 @@ const getCsv = async () => {
     changeGraphLabelElement.style.opacity = 1;
     filterStep1Button.style.display = 'none';
     filterStep2Button.style.display = 'none';
+
+    firstFilter = null;
   });
 
   filterStep2Button.addEventListener('click', () => {
@@ -182,6 +216,8 @@ const getCsv = async () => {
     onChangeElement.disabled = false;
     changeGraphLabelElement.style.opacity = 1;
     filterStep2Button.style.display = 'none';
+
+    secondFilter = null;
   });
 }
 
@@ -327,6 +363,7 @@ const createGraph = (id, type, graph, height, data) => {
             showRegionsGraphs(data, d);
           } else if (countries.has(d.name)) {
             // test
+            secondFilter = d.name;
             showCountriesGraphs(data, d, firstFilter);
           }
       }

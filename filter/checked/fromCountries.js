@@ -1,29 +1,40 @@
-import { fromRegionField, inType, insideType, region, toLeagueField, toRegionField, typeField } from "../fields";
-import { leaguesOrder, regionsOrder } from "../order";
+import { fromCountryField, fromRegionField, inType, insideType, region, toCountryField, toLeagueField, toRegionField, typeField } from "../../fields";
+import { leaguesOrder } from "../../order";
 
-export const fromRegionInInsideToLegueTop = (data) => {
+export const fromCountries = (data, regionType) => {
+  const countries = {};
 
-  const regions = {};
-  data.reduce((prev, curr, i) => {
-    if (!regions[curr[fromRegionField]]) {
-      regions[curr[fromRegionField]] = {value: 1, title: curr[fromRegionField]}
+  const filtered = data.filter(d => 
+    (d[typeField] === insideType || d[typeField] === inType) 
+    && d[fromRegionField] === regionType
+    && d[toRegionField] === region
+  );
+
+  filtered.reduce((prev, curr, i) => {
+    if (!countries[curr[fromCountryField]]) {
+      countries[curr[fromCountryField]] = {value: 1, title: curr[fromCountryField]}
     } else {
-      regions[curr[fromRegionField]].value += 1;
+      countries[curr[fromCountryField]].value += 1;
     }
-  }, regions);
+  }, countries);
 
   const nodes = [];
   const links = [];
   let transfers = 0;
 
-  regionsOrder.forEach(key => {
-    const fromRegions = data.filter(d => 
+  const orderedKeys = Object.entries(countries)
+    .sort((a, b) => b[1].value - a[1].value)
+    .map(k => k[0]);
+
+  orderedKeys.forEach(key => {
+    const fromCountries = data.filter(d => 
       (d[typeField] === insideType || d[typeField] === inType) 
-      && d[fromRegionField] === key 
+      && d[fromCountryField] === key 
+      && d[fromRegionField] === regionType
       && d[toRegionField] === region
     );
-    if (fromRegions.length > 0) {
-      transfers += fromRegions.length;
+    if (fromCountries.length > 0) {
+      transfers += fromCountries.length;
       const index = nodes.length;
       nodes.push({
         node: index,
@@ -31,7 +42,7 @@ export const fromRegionInInsideToLegueTop = (data) => {
       });
 
       const leagues = {};
-      fromRegions.reduce((prev, curr, i) => {
+      fromCountries.reduce((prev, curr, i) => {
         if (!leagues[curr[toLeagueField]]) {
           leagues[curr[toLeagueField]] = {value: 1, title: curr[toLeagueField]}
         } else {
@@ -62,7 +73,7 @@ export const fromRegionInInsideToLegueTop = (data) => {
         }
       });
     }
-  });
-  
+  })
+
   return {nodes, links, transfers};
 }
