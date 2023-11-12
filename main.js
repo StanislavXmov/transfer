@@ -16,6 +16,8 @@ import { fromCountryFromLeague } from './filter/countries/fromCountryFromLeague'
 import { fromLeagueToCountry } from './filter/countries/fromLeagueToCountry';
 import { fromCountries } from './filter/checked/fromCountries';
 import { toCountries } from './filter/checked/toCountries';
+import { fromLegues } from './filter/checked/fromLegues';
+import { toLeagues } from './filter/checked/toLeagues';
 
 const margin = {top: 10, right: 10, bottom: 10, left: 10};
 const width = 400 - margin.left - margin.right;
@@ -155,6 +157,15 @@ const showCountriesByLeagues = (leftData, rightData, data) => {
     createGraphs(leftData, rightData, data);
   } 
 }
+const showLeaguesByLeagues = (leftData, rightData, data) => {
+  let defaultHeight = 620;
+  if (rightData.nodes.length > 10 || leftData.nodes.length > 10) {
+    defaultHeight = 620 * 2;
+    createGraphsWithMoreNodes(leftData, rightData, defaultHeight, data);
+  } else {
+    createGraphs(leftData, rightData, data);
+  } 
+}
 
 const datas = {};
 console.log(datas);
@@ -187,13 +198,19 @@ const getCsv = async () => {
       }
     } else if (secondFilter) {
       // console.log({secondFilter});
-
+      if (e.target.checked) {
+        const nextLeftData = fromLegues(data, secondFilter);
+        const nextRightData = toLeagues(data, secondFilter);
+        showLeaguesByLeagues(nextLeftData, nextRightData, data);
+      } else {
+        showCountriesGraphs(data, {name: secondFilter}, firstFilter);
+      }
     } else if (firstFilter) {
       // console.log({firstFilter});
       if (e.target.checked) {
         const nextLeftData = fromCountries(data, firstFilter);
         const nextRightData = toCountries(data, firstFilter);
-        showCountriesByLeagues(nextLeftData, nextRightData,  data);
+        showCountriesByLeagues(nextLeftData, nextRightData, data);
       } else {
         showRegionsGraphs(data, {name: firstFilter});
       }
