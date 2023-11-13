@@ -1,38 +1,39 @@
-import { fromCountryField, fromLeagueField, fromRegionField, inType, insideType, region, toLeagueField, toRegionField, typeField } from "../../fields";
+import { fromCountryField, fromLeagueField, fromRegionField, fromTeamField, inType, insideType, region, toLeagueField, toRegionField, typeField } from "../../fields";
 import { leaguesOrder } from "../../order";
 
-export const fromLegues = (data, country) => {
+export const fromTeams = (data, league, secondFilter) => {
   let filteredByCountry = [];
-  const currentLeagues = {};
+  const currentTeams = {};
 
   const filteredByType = data.filter(d => 
     d[typeField] === inType || d[typeField] === insideType);
 
   filteredByCountry = filteredByType.filter(d => 
-    d[fromCountryField] === country 
+    d[fromCountryField] === secondFilter 
     && d[toRegionField] === region 
     && d[fromRegionField] !== region
+    && d[fromLeagueField] === league
   );
 
   filteredByCountry.reduce((prev, curr, i) => {
-    if (!currentLeagues[curr[fromLeagueField]]) {
-      currentLeagues[curr[fromLeagueField]] = {value: 1, title: curr[fromLeagueField]}
+    if (!currentTeams[curr[fromTeamField]]) {
+      currentTeams[curr[fromTeamField]] = {value: 1, title: curr[fromTeamField]}
     } else {
-      currentLeagues[curr[fromLeagueField]].value += 1;
+      currentTeams[curr[fromTeamField]].value += 1;
     }
-  }, currentLeagues);
+  }, currentTeams);
 
   const nodes = [];
   const links = [];
   let transfers = 0;
 
-  const orderedKeys = Object.entries(currentLeagues)
+  const orderedKeys = Object.entries(currentTeams)
     .sort((a, b) => b[1].value - a[1].value)
     .map(k => k[0]);
 
   orderedKeys.forEach(key => {
     const fromLeagues = filteredByCountry.filter(d => 
-      d[fromLeagueField] === key
+      d[fromTeamField] === key
     );
     if (fromLeagues.length > 0) {
       transfers += fromLeagues.length;
@@ -52,6 +53,7 @@ export const fromLegues = (data, country) => {
       }, leagues);
       
       leaguesOrder.forEach(key => {
+        // filter 
         if (filteredByCountry.find(t => t[toLeagueField] === key.key) && !nodes.find(n => n.name === key.title)) {
           const index = nodes.length;
           nodes.push({
@@ -75,6 +77,5 @@ export const fromLegues = (data, country) => {
       });
     }
   });
-
   return {nodes, links, transfers};
 }

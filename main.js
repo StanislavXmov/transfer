@@ -21,6 +21,8 @@ import { toLeagues } from './filter/checked/toLeagues';
 import { fromLeagueField, toLeagueField } from './fields';
 import { fromLeagueToTeams } from './filter/teams/fromLeagueToTeams';
 import { fromLeagueToTeamsOut } from './filter/teams/fromLeagueToTeamsOut';
+import { fromTeams } from './filter/checked/fromTeams';
+import { toTeams } from './filter/checked/toTeams';
 
 const margin = {top: 10, right: 10, bottom: 10, left: 10};
 const width = 400 - margin.left - margin.right;
@@ -195,16 +197,7 @@ const showTeamsGraphs = (data, node, firstFilter, secondFilter) => {
   }
 }
 
-const showCountriesByLeagues = (leftData, rightData, data) => {
-  let defaultHeight = 620;
-  if (rightData.nodes.length > 10 || leftData.nodes.length > 10) {
-    defaultHeight = 620 * 2;
-    createGraphsWithMoreNodes(leftData, rightData, defaultHeight, data);
-  } else {
-    createGraphs(leftData, rightData, data);
-  } 
-}
-const showLeaguesByLeagues = (leftData, rightData, data) => {
+const showByLeagues = (leftData, rightData, data) => {
   let defaultHeight = 620;
   if (rightData.nodes.length > 10 || leftData.nodes.length > 10) {
     defaultHeight = 620 * 2;
@@ -264,12 +257,24 @@ const getCsv = async () => {
       } else {
         createGraphs(leftData, rightData, data);
       }
+    } else if (thirdFilter) {
+      // console.log({thirdFilter});
+      if (e.target.checked) {
+        clearGraph(graphRightId, right);
+        clearGraph(graphLeftId, left);
+
+        const nextLeftData = fromTeams(data, thirdFilter, secondFilter);
+        const nextRightData = toTeams(data, thirdFilter, secondFilter);
+        showByLeagues(nextLeftData, nextRightData, data);
+      } else {
+        showTeamsGraphs(data, {name: thirdFilter}, firstFilter, secondFilter);
+      }
     } else if (secondFilter) {
       // console.log({secondFilter});
       if (e.target.checked) {
         const nextLeftData = fromLegues(data, secondFilter);
         const nextRightData = toLeagues(data, secondFilter);
-        showLeaguesByLeagues(nextLeftData, nextRightData, data);
+        showByLeagues(nextLeftData, nextRightData, data);
       } else {
         showCountriesGraphs(data, {name: secondFilter}, firstFilter);
       }
@@ -278,7 +283,7 @@ const getCsv = async () => {
       if (e.target.checked) {
         const nextLeftData = fromCountries(data, firstFilter);
         const nextRightData = toCountries(data, firstFilter);
-        showCountriesByLeagues(nextLeftData, nextRightData, data);
+        showByLeagues(nextLeftData, nextRightData, data);
       } else {
         showRegionsGraphs(data, {name: firstFilter});
       }
