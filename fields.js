@@ -27,10 +27,12 @@ export const fromRegionField = "From Region";
 export const fromCountryField = "From Country";
 export const fromLeagueField = "From League";
 export const fromLevelField = "From Level";
+export const fromTeamField = "From Team";
 export const toRegionField = "To Region";
 export const toCountryField = "To Country";
 export const toLeagueField = "To League";
 export const toLevelField = "To Level";
+export const toTeamField = "To Team";
 
 export const outType = 'Out';
 export const inType = 'In';

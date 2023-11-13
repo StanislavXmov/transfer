@@ -64,7 +64,9 @@ body {
   /* border: 1px dashed #0000002e; */
 }
 
-#filterStep1Button, #filterStep2Button {
+#filterStep1Button,
+#filterStep2Button,
+#filterStep3Button {
   display: none;
   margin-top: 12px;
   padding: 2px 6px;

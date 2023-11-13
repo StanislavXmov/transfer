@@ -18,6 +18,9 @@ import { fromCountries } from './filter/checked/fromCountries';
 import { toCountries } from './filter/checked/toCountries';
 import { fromLegues } from './filter/checked/fromLegues';
 import { toLeagues } from './filter/checked/toLeagues';
+import { fromLeagueField, toLeagueField } from './fields';
+import { fromLeagueToTeams } from './filter/teams/fromLeagueToTeams';
+import { fromLeagueToTeamsOut } from './filter/teams/fromLeagueToTeamsOut';
 
 const margin = {top: 10, right: 10, bottom: 10, left: 10};
 const width = 400 - margin.left - margin.right;
@@ -34,6 +37,9 @@ const filterStep1ButtonTitle = document.getElementById('filterStep1ButtonTitle')
 
 const filterStep2Button = document.getElementById('filterStep2Button');
 const filterStep2ButtonTitle = document.getElementById('filterStep2ButtonTitle');
+
+const filterStep3Button = document.getElementById('filterStep3Button');
+const filterStep3ButtonTitle = document.getElementById('filterStep3ButtonTitle');
 
 const graphLeftId = '#graphLeft';
 const left = 'left';
@@ -148,6 +154,47 @@ const showCountriesGraphs = (data, node, firstFilter) => {
   createGraphs(newLeftData, newRightData, data);
 }
 
+const showTeamsGraphs = (data, node, firstFilter, secondFilter) => {
+  onChangeElement.checked = false;
+
+  // onChangeElement.disabled = true;
+  // changeGraphLabelElement.style.opacity = 0.4;
+
+  let defaultHeight = 620;
+  filterStep3Button.style.display = 'block';
+  filterStep3ButtonTitle.textContent = node.name;
+
+  let newRightData, newLeftData; 
+  if (datas.teams && datas.teams[node.name]) {
+    newRightData = datas.teams[node.name].right;
+    newLeftData = datas.teams[node.name].left;
+  } else {
+    if (!datas.teams) {
+      datas.teams = {};
+    }
+
+    newLeftData = fromLeagueToTeams(data, node.name, firstFilter, secondFilter);
+    newRightData = fromLeagueToTeamsOut(data, node.name, firstFilter, secondFilter);
+
+    datas.teams[node.name] = {};
+    datas.teams[node.name].left = newLeftData;
+    datas.teams[node.name].right = newRightData;
+  }
+
+  signingElement.textContent = newLeftData.transfers;
+  outingElement.textContent = newRightData.transfers;
+  signingFromElement.textContent = node.name;
+  outingFromElement.textContent = node.name;
+
+  filterStep3Button.dataset.regions = node.name;
+  if (newRightData.nodes.length > 10 || newLeftData.nodes.length > 10) {
+    defaultHeight = 620 * 2;
+    createGraphsWithMoreNodes(newLeftData, newRightData, defaultHeight, data);
+  } else {
+    createGraphs(newLeftData, newRightData, data);
+  }
+}
+
 const showCountriesByLeagues = (leftData, rightData, data) => {
   let defaultHeight = 620;
   if (rightData.nodes.length > 10 || leftData.nodes.length > 10) {
@@ -167,14 +214,35 @@ const showLeaguesByLeagues = (leftData, rightData, data) => {
   } 
 }
 
+const getAllLeagues = (data) => {
+  const l = {};
+  data.reduce((prev, curr, i) => {
+    if (!l[curr[fromLeagueField]]) {
+      l[curr[fromLeagueField]] = {value: 1, title: curr[fromLeagueField]}
+    } else {
+      l[curr[fromLeagueField]].value += 1;
+    }
+    if (!l[curr[toLeagueField]]) {
+      l[curr[toLeagueField]] = {value: 1, title: curr[toLeagueField]}
+    } else {
+      l[curr[toLeagueField]].value += 1;
+    }
+  }, l);
+  return Object.keys(l);
+}
+
 const datas = {};
 console.log(datas);
+let leaguesKey = [];
 let firstFilter = null;
 let secondFilter = null;
+let thirdFilter = null;
 
 const getCsv = async () => {
   const data = await d3.csv('./football-transfers.csv');
   console.log(data);
+
+  leaguesKey = getAllLeagues(data);
 
   const leftData = toTopInInside(data);
   const rightData = fromTopOutInside(data);
@@ -224,8 +292,11 @@ const getCsv = async () => {
     changeGraphLabelElement.style.opacity = 1;
     filterStep1Button.style.display = 'none';
     filterStep2Button.style.display = 'none';
+    filterStep3Button.style.display = 'none';
 
     firstFilter = null;
+    secondFilter = null;
+    thirdFilter = null;
   });
 
   filterStep2Button.addEventListener('click', () => {
@@ -233,8 +304,19 @@ const getCsv = async () => {
     onChangeElement.disabled = false;
     changeGraphLabelElement.style.opacity = 1;
     filterStep2Button.style.display = 'none';
+    filterStep3Button.style.display = 'none';
 
     secondFilter = null;
+    thirdFilter = null;
+  });
+
+  filterStep3Button.addEventListener('click', () => {
+    showCountriesGraphs(data, {name: secondFilter}, firstFilter);
+    onChangeElement.disabled = false;
+    changeGraphLabelElement.style.opacity = 1;
+    filterStep3Button.style.display = 'none';
+
+    thirdFilter = null;
   });
 }
 
@@ -379,9 +461,11 @@ const createGraph = (id, type, graph, height, data) => {
             firstFilter = d.name;
             showRegionsGraphs(data, d);
           } else if (countries.has(d.name)) {
-            // test
             secondFilter = d.name;
             showCountriesGraphs(data, d, firstFilter);
+          } else if (leaguesKey.includes(d.name)) {
+            thirdFilter = d.name;
+            showTeamsGraphs(data, d, firstFilter, secondFilter);
           }
       }
       })
