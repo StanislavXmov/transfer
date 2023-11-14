@@ -231,6 +231,8 @@ let firstFilter = null;
 let secondFilter = null;
 let thirdFilter = null;
 
+// test color
+// const color = d3.scaleOrdinal(d3.schemePaired);
 const getCsv = async () => {
   const data = await d3.csv('./football-transfers.csv');
   console.log(data);
@@ -360,9 +362,26 @@ const createGraph = (id, type, graph, height, data) => {
   .data(links)
   .join("g")
   .style("mix-blend-mode", "multiply");
+  // test color
+  // const gradient = link.append("linearGradient")
+  //   .attr("id", d => {
+  //     return `${d.index}Link`;
+  //   })
+  //   .attr("gradientUnits", "userSpaceOnUse")
+  //   .attr("x1", d => d.source.x1)
+  //   .attr("x2", d => d.target.x0);
+  // gradient.append("stop")
+  //   .attr("offset", "0%")
+  //   .attr("stop-color", d => color(d.source.name));
+  // gradient.append("stop")
+  //   .attr("offset", "100%")
+  //   .attr("stop-color", d => color(d.target.name));
+
   link.append("path")
     .attr("d", sankeyLinkHorizontal())
     .attr("stroke-width", d => Math.max(1, d.width))
+    // test color
+    // .attr("stroke", d => `url(#${d.index}Link)`)
     .style("cursor", "pointer")
     .on('mouseover', (e, d) => {
       d3.select(e.target).style("opacity", 0.8);
