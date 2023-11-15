@@ -4,16 +4,24 @@ export const fromLeagueToTeams = (data, league, firstFilter, secondFilter) => {
   // console.log(data, league, firstFilter, secondFilter);
 
   let filteredByCountry = [];
-
   const filteredByType = data.filter(d => 
     d[typeField] === inType || d[typeField] === insideType);
 
+  if (firstFilter === region) {
+    filteredByCountry = filteredByType.filter(d => 
+      d[fromCountryField] === secondFilter
+      && d[fromRegionField] === region
+      && d[toRegionField] === region 
+      && d[fromLeagueField] === league
+    );
+  } else {
     filteredByCountry = filteredByType.filter(d => 
       d[fromCountryField] === secondFilter 
       && d[toRegionField] === region 
       && d[fromRegionField] !== region
       && d[fromLeagueField] === league
     );
+  }
   
   const transfers = filteredByCountry.length;
 

@@ -249,11 +249,11 @@ const renderGraph = (leftData, rightData, data) => {
     leftHeight = leftData.transfers / n + dhL;
     rightHeight = rightData.transfers / n + dhR;
   } 
-  else if (max <= 100 && (leftData.nodes.length > 5 || rightData.nodes.length > 5)) {
-    n = 0.05;
-    leftHeight = leftData.transfers / n + dhL;
-    rightHeight = rightData.transfers / n + dhR;
-  }
+  // else if (max <= 100 && (leftData.nodes.length > 5 || rightData.nodes.length > 5)) {
+  //   n = 0.05;
+  //   leftHeight = leftData.transfers / n + dhL;
+  //   rightHeight = rightData.transfers / n + dhR;
+  // }
   else if (max <= 300) {
     n = 0.25;
     leftHeight = leftData.transfers / n + dhL;
@@ -308,16 +308,16 @@ const getCsv = async () => {
     } else if (thirdFilter) {
       // console.log({thirdFilter});
       if (e.target.checked) {
-        const nextLeftData = fromTeams(data, thirdFilter, secondFilter);
+        const nextLeftData = fromTeams(data, thirdFilter, secondFilter, firstFilter);
         const nextRightData = toTeams(data, thirdFilter, secondFilter, firstFilter);
         showByLeagues(nextLeftData, nextRightData, data);
       } else {
         showTeamsGraphs(data, {name: thirdFilter}, firstFilter, secondFilter);
       }
     } else if (secondFilter) {
-      console.log({secondFilter});
+      // console.log({secondFilter});
       if (e.target.checked) {
-        const nextLeftData = fromLegues(data, secondFilter);
+        const nextLeftData = fromLegues(data, secondFilter, firstFilter);
         const nextRightData = toLeagues(data, secondFilter, firstFilter);
         showByLeagues(nextLeftData, nextRightData, data);
       } else {
@@ -535,6 +535,11 @@ const createGraph = (id, type, graph, height, data) => {
             showTeamsGraphs(data, d, firstFilter, secondFilter);
           }
       }
+      })
+      .style('pointer-events', d => {
+        if (d.root && d.isLeagues) {
+          return 'none';
+        }
       })
       // .text(d => d.name);
       .text(d => {

@@ -1,4 +1,4 @@
-import { fromLeagueField, inType, outType, regionEurope, toCountryField, toLeagueField, toRegionField, toTeamField, typeField } from "../../fields";
+import { fromLeagueField, fromRegionField, inType, insideType, outType, region, regionEurope, toCountryField, toLeagueField, toRegionField, toTeamField, typeField } from "../../fields";
 import { leaguesOrder } from "../../order";
 
 export const toTeams = (data, league, secondFilter, firstFilter) => {
@@ -6,13 +6,22 @@ export const toTeams = (data, league, secondFilter, firstFilter) => {
   const currentTeams = {};
 
   const filteredByType = data.filter(d => 
-    d[typeField] === inType || d[typeField] === outType);
-
-  filteredByCountry = filteredByType.filter(d => 
-    d[toRegionField] === firstFilter
-    && d[toCountryField] === secondFilter
-    && d[toLeagueField] === league
-  );
+    d[typeField] === outType || d[typeField] === insideType);
+  
+  if (firstFilter === region) {
+    filteredByCountry = filteredByType.filter(d => 
+      d[toRegionField] === firstFilter
+      && d[fromRegionField] === region
+      && d[toCountryField] === secondFilter
+      && d[toLeagueField] === league
+    );
+  } else {
+    filteredByCountry = filteredByType.filter(d => 
+      d[toRegionField] === firstFilter
+      && d[toCountryField] === secondFilter
+      && d[toLeagueField] === league
+    );
+  }
 
   filteredByCountry.reduce((prev, curr, i) => {
     if (!currentTeams[curr[toTeamField]]) {
