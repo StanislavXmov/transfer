@@ -111,13 +111,14 @@ const showRegionsGraphs = (data, node) => {
   outingFromElement.textContent = node.name;
 
   filterStep1Button.dataset.regions = node.name;
-  
-  if (newRightData.nodes.length > 10 || newLeftData.nodes.length > 10) {
-    defaultHeight = 620 * 2;
-    createGraphsWithMoreNodes(newLeftData, newRightData, defaultHeight, data);
-  } else {
-    createGraphs(newLeftData, newRightData, data);
-  } 
+
+  renderGraph(newLeftData, newRightData, data);
+  // if (newRightData.nodes.length > 10 || newLeftData.nodes.length > 10) {
+  //   defaultHeight = 620 * 2;
+  //   createGraphsWithMoreNodes(newLeftData, newRightData, defaultHeight, data);
+  // } else {
+  //   createGraphs(newLeftData, newRightData, data);
+  // } 
 }
 
 const showCountriesGraphs = (data, node, firstFilter) => {
@@ -153,7 +154,8 @@ const showCountriesGraphs = (data, node, firstFilter) => {
 
   filterStep2Button.dataset.country = node.name;
 
-  createGraphs(newLeftData, newRightData, data);
+  // createGraphs(newLeftData, newRightData, data);
+  renderGraph(newLeftData, newRightData, data);
 }
 
 const showTeamsGraphs = (data, node, firstFilter, secondFilter) => {
@@ -189,22 +191,25 @@ const showTeamsGraphs = (data, node, firstFilter, secondFilter) => {
   outingFromElement.textContent = node.name;
 
   filterStep3Button.dataset.regions = node.name;
-  if (newRightData.nodes.length > 10 || newLeftData.nodes.length > 10) {
-    defaultHeight = 620 * 2;
-    createGraphsWithMoreNodes(newLeftData, newRightData, defaultHeight, data);
-  } else {
-    createGraphs(newLeftData, newRightData, data);
-  }
+
+  renderGraph(newLeftData, newRightData, data);
+  // if (newRightData.nodes.length > 10 || newLeftData.nodes.length > 10) {
+  //   defaultHeight = 620 * 2;
+  //   createGraphsWithMoreNodes(newLeftData, newRightData, defaultHeight, data);
+  // } else {
+  //   createGraphs(newLeftData, newRightData, data);
+  // }
 }
 
 const showByLeagues = (leftData, rightData, data) => {
-  let defaultHeight = 620;
-  if (rightData.nodes.length > 10 || leftData.nodes.length > 10) {
-    defaultHeight = 620 * 2;
-    createGraphsWithMoreNodes(leftData, rightData, defaultHeight, data);
-  } else {
-    createGraphs(leftData, rightData, data);
-  } 
+  renderGraph(leftData, rightData, data);
+  // let defaultHeight = 620;
+  // if (rightData.nodes.length > 10 || leftData.nodes.length > 10) {
+  //   defaultHeight = 620 * 2;
+  //   createGraphsWithMoreNodes(leftData, rightData, defaultHeight, data);
+  // } else {
+  //   createGraphs(leftData, rightData, data);
+  // } 
 }
 
 const getAllLeagues = (data) => {
@@ -222,6 +227,41 @@ const getAllLeagues = (data) => {
     }
   }, l);
   return Object.keys(l);
+}
+
+const renderGraph = (leftData, rightData, data) => {
+  clearGraph(graphRightId, right);
+  clearGraph(graphLeftId, left);
+
+  const maxDefaultHeight = 780;
+  let n = 1;
+  
+  const padding = 20;
+  const dhL = leftData.nodes.filter(n => !n.root).length * padding;
+  let leftHeight = leftData.transfers / n + dhL;
+  const dhR = rightData.nodes.filter(n => !n.root).length * padding;
+  let rightHeight = rightData.transfers / n + dhR;
+
+  const max = Math.max(leftHeight, rightHeight);
+  
+  if (max >= 780) {
+    n = 4;
+    leftHeight = leftData.transfers / n + dhL;
+    rightHeight = rightData.transfers / n + dhR;
+  } 
+  else if (max <= 100 && (leftData.nodes.length > 5 || rightData.nodes.length > 5)) {
+    n = 0.05;
+    leftHeight = leftData.transfers / n + dhL;
+    rightHeight = rightData.transfers / n + dhR;
+  }
+  else if (max <= 300) {
+    n = 0.25;
+    leftHeight = leftData.transfers / n + dhL;
+    rightHeight = rightData.transfers / n + dhR;
+  }
+
+  createGraph(graphLeftId, left, leftData, leftHeight, data);
+  createGraph(graphRightId, right, rightData, rightHeight, data);
 }
 
 const datas = {};
@@ -246,7 +286,11 @@ const getCsv = async () => {
   datas.top.left = leftData;
   datas.top.right = rightData;
 
-  createGraphs(leftData, rightData, data);
+  // createGraphs(leftData, rightData, data);
+  signingElement.textContent = leftData.transfers;
+  outingElement.textContent = rightData.transfers;
+
+  renderGraph(leftData, rightData, data);
 
   onChangeElement.addEventListener('change', (e) => {
     
@@ -255,27 +299,26 @@ const getCsv = async () => {
       if (e.target.checked) {
         const nextLeftData = fromRegionInInsideToLegueTop(data);
         const nextRightData = fromLeagueTopOutInsideToRegion(data);
-        createGraphs(nextLeftData, nextRightData, data);
+        // createGraphs(nextLeftData, nextRightData, data);
+        renderGraph(nextLeftData, nextRightData, data);
       } else {
-        createGraphs(leftData, rightData, data);
+        // createGraphs(leftData, rightData, data);
+        renderGraph(leftData, rightData, data);
       }
     } else if (thirdFilter) {
       // console.log({thirdFilter});
       if (e.target.checked) {
-        clearGraph(graphRightId, right);
-        clearGraph(graphLeftId, left);
-
         const nextLeftData = fromTeams(data, thirdFilter, secondFilter);
-        const nextRightData = toTeams(data, thirdFilter, secondFilter);
+        const nextRightData = toTeams(data, thirdFilter, secondFilter, firstFilter);
         showByLeagues(nextLeftData, nextRightData, data);
       } else {
         showTeamsGraphs(data, {name: thirdFilter}, firstFilter, secondFilter);
       }
     } else if (secondFilter) {
-      // console.log({secondFilter});
+      console.log({secondFilter});
       if (e.target.checked) {
         const nextLeftData = fromLegues(data, secondFilter);
-        const nextRightData = toLeagues(data, secondFilter);
+        const nextRightData = toLeagues(data, secondFilter, firstFilter);
         showByLeagues(nextLeftData, nextRightData, data);
       } else {
         showCountriesGraphs(data, {name: secondFilter}, firstFilter);

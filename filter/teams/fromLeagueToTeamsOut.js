@@ -6,7 +6,7 @@ export const fromLeagueToTeamsOut = (data, league, firstFilter, secondFilter) =>
   const filteredByType = data.filter(d => 
     d[typeField] === inType || d[typeField] === outType);
   filteredByCountry = filteredByType.filter(d => 
-    d[toRegionField] === regionEurope
+    d[toRegionField] === firstFilter
     && d[toCountryField] === secondFilter 
     && d[toLeagueField] === league
   );

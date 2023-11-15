@@ -15,7 +15,8 @@ export const fromLeagueToCountry = (data, country, firstFilter) => {
     );
   } else {
     filteredByCountry = filteredByType.filter(d => 
-      d[toRegionField] === regionEurope
+      // d[toRegionField] === regionEurope
+      d[toRegionField] === firstFilter
       && d[toCountryField] === country 
       // test
       // && d[toRegionField] !== regionEurope

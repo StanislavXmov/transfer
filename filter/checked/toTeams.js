@@ -1,7 +1,7 @@
 import { fromLeagueField, inType, outType, regionEurope, toCountryField, toLeagueField, toRegionField, toTeamField, typeField } from "../../fields";
 import { leaguesOrder } from "../../order";
 
-export const toTeams = (data, league, secondFilter) => {
+export const toTeams = (data, league, secondFilter, firstFilter) => {
   let filteredByCountry = [];
   const currentTeams = {};
 
@@ -9,7 +9,7 @@ export const toTeams = (data, league, secondFilter) => {
     d[typeField] === inType || d[typeField] === outType);
 
   filteredByCountry = filteredByType.filter(d => 
-    d[toRegionField] === regionEurope
+    d[toRegionField] === firstFilter
     && d[toCountryField] === secondFilter
     && d[toLeagueField] === league
   );
