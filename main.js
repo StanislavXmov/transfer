@@ -18,11 +18,13 @@ import { fromCountries } from './filter/checked/fromCountries';
 import { toCountries } from './filter/checked/toCountries';
 import { fromLegues } from './filter/checked/fromLegues';
 import { toLeagues } from './filter/checked/toLeagues';
-import { fromLeagueField, toLeagueField } from './fields';
+import { fromLeagueField, fromTeamField, toLeagueField, toTeamField } from './fields';
 import { fromLeagueToTeams } from './filter/teams/fromLeagueToTeams';
 import { fromLeagueToTeamsOut } from './filter/teams/fromLeagueToTeamsOut';
 import { fromTeams } from './filter/checked/fromTeams';
 import { toTeams } from './filter/checked/toTeams';
+import { fromTeamsToFootballmans } from './filter/footballmans/fromTeamsToFootballmans';
+import { fromTeamsToFootballmansOut } from './filter/footballmans/fromTeamsToFootballmansOut';
 
 const margin = {top: 10, right: 10, bottom: 10, left: 10};
 const width = 400 - margin.left - margin.right;
@@ -200,6 +202,42 @@ const showTeamsGraphs = (data, node, firstFilter, secondFilter) => {
   //   createGraphs(newLeftData, newRightData, data);
   // }
 }
+const showFootbollmanGraphs = (data, node, firstFilter, secondFilter, thirdFilter) => {
+  onChangeElement.checked = false;
+
+  // onChangeElement.disabled = true;
+  // changeGraphLabelElement.style.opacity = 0.4;
+
+  // let defaultHeight = 620;
+  // filterStep3Button.style.display = 'block';
+  // filterStep3ButtonTitle.textContent = node.name;
+
+  let newRightData, newLeftData; 
+  if (datas.teams && datas.teams[node.name]) {
+    newRightData = datas.teams[node.name].right;
+    newLeftData = datas.teams[node.name].left;
+  } else {
+    if (!datas.teams) {
+      datas.teams = {};
+    }
+
+    newLeftData = fromTeamsToFootballmans(data, node.name, firstFilter, secondFilter, thirdFilter);
+    newRightData = fromTeamsToFootballmansOut(data, node.name, firstFilter, secondFilter, thirdFilter)
+
+    datas.teams[node.name] = {};
+    datas.teams[node.name].left = newLeftData;
+    datas.teams[node.name].right = newRightData;
+  }
+
+  signingElement.textContent = newLeftData.transfers;
+  outingElement.textContent = newRightData.transfers;
+  signingFromElement.textContent = node.name;
+  outingFromElement.textContent = node.name;
+
+  // filterStep3Button.dataset.regions = node.name;
+
+  renderGraph(newLeftData, newRightData, data);
+}
 
 const showByLeagues = (leftData, rightData, data) => {
   renderGraph(leftData, rightData, data);
@@ -224,6 +262,23 @@ const getAllLeagues = (data) => {
       l[curr[toLeagueField]] = {value: 1, title: curr[toLeagueField]}
     } else {
       l[curr[toLeagueField]].value += 1;
+    }
+  }, l);
+  return Object.keys(l);
+}
+
+const getAllTeams = (data) => {
+  const l = {};
+  data.reduce((prev, curr, i) => {
+    if (!l[curr[fromTeamField]]) {
+      l[curr[fromTeamField]] = {value: 1, title: curr[fromTeamField]}
+    } else {
+      l[curr[fromTeamField]].value += 1;
+    }
+    if (!l[curr[toTeamField]]) {
+      l[curr[toTeamField]] = {value: 1, title: curr[toTeamField]}
+    } else {
+      l[curr[toTeamField]].value += 1;
     }
   }, l);
   return Object.keys(l);
@@ -267,6 +322,7 @@ const renderGraph = (leftData, rightData, data) => {
 const datas = {};
 console.log(datas);
 let leaguesKey = [];
+let teamsKey = [];
 let firstFilter = null;
 let secondFilter = null;
 let thirdFilter = null;
@@ -278,6 +334,7 @@ const getCsv = async () => {
   console.log(data);
 
   leaguesKey = getAllLeagues(data);
+  teamsKey = getAllTeams(data);
 
   const leftData = toTopInInside(data);
   const rightData = fromTopOutInside(data);
@@ -533,6 +590,10 @@ const createGraph = (id, type, graph, height, data) => {
           } else if (leaguesKey.includes(d.name)) {
             thirdFilter = d.name;
             showTeamsGraphs(data, d, firstFilter, secondFilter);
+          } else if (teamsKey.includes(d.name)) {
+            // fourth = d.name;
+            console.log(d.name);
+            showFootbollmanGraphs(data, d, firstFilter, secondFilter, thirdFilter);
           }
       }
       })
