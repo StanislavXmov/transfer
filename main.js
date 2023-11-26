@@ -25,6 +25,8 @@ import { fromTeams } from './filter/checked/fromTeams';
 import { toTeams } from './filter/checked/toTeams';
 import { fromTeamsToFootballmans } from './filter/footballmans/fromTeamsToFootballmans';
 import { fromTeamsToFootballmansOut } from './filter/footballmans/fromTeamsToFootballmansOut';
+import { fromFootballmans } from './filter/checked/fromFootballmans';
+import { toFootballmans } from './filter/checked/toFootballmans';
 
 const margin = {top: 10, right: 10, bottom: 10, left: 10};
 const width = 400 - margin.left - margin.right;
@@ -44,6 +46,9 @@ const filterStep2ButtonTitle = document.getElementById('filterStep2ButtonTitle')
 
 const filterStep3Button = document.getElementById('filterStep3Button');
 const filterStep3ButtonTitle = document.getElementById('filterStep3ButtonTitle');
+
+const filterStep4Button = document.getElementById('filterStep4Button');
+const filterStep4ButtonTitle = document.getElementById('filterStep4ButtonTitle');
 
 const graphLeftId = '#graphLeft';
 const left = 'left';
@@ -209,8 +214,8 @@ const showFootbollmanGraphs = (data, node, firstFilter, secondFilter, thirdFilte
   // changeGraphLabelElement.style.opacity = 0.4;
 
   // let defaultHeight = 620;
-  // filterStep3Button.style.display = 'block';
-  // filterStep3ButtonTitle.textContent = node.name;
+  filterStep4Button.style.display = 'block';
+  filterStep4ButtonTitle.textContent = node.name;
 
   let newRightData, newLeftData; 
   if (datas.teams && datas.teams[node.name]) {
@@ -234,7 +239,7 @@ const showFootbollmanGraphs = (data, node, firstFilter, secondFilter, thirdFilte
   signingFromElement.textContent = node.name;
   outingFromElement.textContent = node.name;
 
-  // filterStep3Button.dataset.regions = node.name;
+  filterStep4Button.dataset.regions = node.name;
 
   renderGraph(newLeftData, newRightData, data);
 }
@@ -326,6 +331,7 @@ let teamsKey = [];
 let firstFilter = null;
 let secondFilter = null;
 let thirdFilter = null;
+let fourthFilter = null;
 
 // test color
 // const color = d3.scaleOrdinal(d3.schemePaired);
@@ -361,6 +367,16 @@ const getCsv = async () => {
       } else {
         // createGraphs(leftData, rightData, data);
         renderGraph(leftData, rightData, data);
+      }
+    } else if (fourthFilter) {
+      // console.log({fourthFilter});
+      if (e.target.checked) {
+        const nextLeftData = fromFootballmans(data, fourthFilter, thirdFilter, secondFilter, firstFilter);
+        const nextRightData = toFootballmans(data, fourthFilter, thirdFilter, secondFilter, firstFilter);
+        
+        renderGraph(nextLeftData, nextRightData, data);
+      } else {
+        showFootbollmanGraphs(data, {name: fourthFilter}, firstFilter, secondFilter, thirdFilter);
       }
     } else if (thirdFilter) {
       // console.log({thirdFilter});
@@ -400,10 +416,12 @@ const getCsv = async () => {
     filterStep1Button.style.display = 'none';
     filterStep2Button.style.display = 'none';
     filterStep3Button.style.display = 'none';
+    filterStep4Button.style.display = 'none';
 
     firstFilter = null;
     secondFilter = null;
     thirdFilter = null;
+    
   });
 
   filterStep2Button.addEventListener('click', () => {
@@ -412,6 +430,7 @@ const getCsv = async () => {
     changeGraphLabelElement.style.opacity = 1;
     filterStep2Button.style.display = 'none';
     filterStep3Button.style.display = 'none';
+    filterStep4Button.style.display = 'none';
 
     secondFilter = null;
     thirdFilter = null;
@@ -422,8 +441,18 @@ const getCsv = async () => {
     onChangeElement.disabled = false;
     changeGraphLabelElement.style.opacity = 1;
     filterStep3Button.style.display = 'none';
+    filterStep4Button.style.display = 'none';
 
     thirdFilter = null;
+  });
+
+  filterStep4Button.addEventListener('click', () => {
+    showTeamsGraphs(data, {name: thirdFilter}, firstFilter, secondFilter);
+    onChangeElement.disabled = false;
+    changeGraphLabelElement.style.opacity = 1;
+    filterStep4Button.style.display = 'none';
+
+    fourthFilter = null;
   });
 }
 
@@ -591,8 +620,7 @@ const createGraph = (id, type, graph, height, data) => {
             thirdFilter = d.name;
             showTeamsGraphs(data, d, firstFilter, secondFilter);
           } else if (teamsKey.includes(d.name)) {
-            // fourth = d.name;
-            console.log(d.name);
+            fourthFilter = d.name;
             showFootbollmanGraphs(data, d, firstFilter, secondFilter, thirdFilter);
           }
       }
