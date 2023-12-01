@@ -46,6 +46,12 @@ body {
   gap: 16px;
 }
 
+.transferContainer {
+  margin: 16px auto 0;
+  width: 100%;
+  border: 2px dashed #c1c2c1;
+}
+
 #graphLeft, #graphRight {
   position: relative;
 }
