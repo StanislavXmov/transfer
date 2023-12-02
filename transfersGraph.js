@@ -1,20 +1,16 @@
 import * as d3 from 'd3';
+import { fromCountryField, fromRegionField, inType, insideType, outType, region, toRegionField, typeField } from './fields';
 
-const data = [
-  {'Market value': 2000, 'Fee': 1000},
-  {'Market value': 100_000, 'Fee': 100_000},
-  {'Market value': 10000, 'Fee': 10000},
-  {'Market value': 500000, 'Fee': 500000},
-  {'Market value': 100_000, 'Fee': 0},
-  {'Market value': 1_000_000, 'Fee': 2_000_000},
-];
-
-console.log(data);
-
-const color = d3.scaleSequential()
-  .interpolator(d3.interpolateCool);
-const color2 = d3.scaleSequential()
-  .interpolator(d3.interpolateBlues);
+const colors = {
+  'Top': '#FEFEFE',
+  'Europe, ex. Top Leagues': '#1FB35F',
+  'Asia': '#F051AE',
+  'South America': '#FEB74F',
+  'North America': '#55AFE1',
+  'Africa': '#FD3A34',
+  'No club': '#C1C1C1',
+  'Retired': '#C1C1C1',
+};
 
 const axisData = [0, 10_000, 100_000, 1_000_000, 10_000_000, 100_000_000, 1_000_000_000];
 const axisStep = 75;
@@ -63,7 +59,8 @@ Object.keys(axis.y).forEach(key => {
 const getX = (d) => {
   for (let j = axisData.length - 1; j >= 0; j--) {
     const x = axisData[j - 1];
-    if (d['Market value'] >= x) {
+    const v = Number(d['Market value'].split(',').join(''));
+    if (v >= x) {
       return axis.x[x];
     }
   }
@@ -71,58 +68,92 @@ const getX = (d) => {
 
 const getY = (d) => {
   for (let j = axisData.length - 1; j >= 0; j--) {
-    const y = axisData[j - 1];
+    let y = axisData[j - 1];
+    if (d['Fee'] === '?') {
+      return axis.y['0'];
+    }
     if (d['Fee'] >= y) {
       return axis.y[y];
     }
   }
 }
 
-svg.append("g")
-  .selectAll()
-  .data(data)
-  .join("clipPath")
-  .attr("id", (d, i) => `cut-off-${i}`)
-    .append("rect")
-    .attr("x", d => getX(d)(d['Market value']) + axisStep)
-    .attr("y", d => getY(d)(d['Fee']) - axisStep / 4 - 5)
-    .attr("width", "7")
-    .attr("height", "10");
+const getFromColor = (d) => {
+  return colors[d[fromRegionField]] || colors['No club'];
+}
 
-svg.append("g")
-  .selectAll()
-  .data(data)
-  .join("clipPath")
-  .attr("id", (d, i) => `cut-off2-${i}`)
-    .append("rect")
-    .attr("x", d => getX(d)(d['Market value']) + axisStep - 7)
-    .attr("y", d => getY(d)(d['Fee']) - axisStep / 4 - 5)
-    .attr("width", "7")
-    .attr("height", "10");
+const getToColor = (d) => {
+  return colors[d[toRegionField]] || colors['No club'];
+}
 
-svg.append("g")
+const createPoints = (data) => {
+  svg.append("g")
+    .selectAll()
+    .data(data)
+    .join("clipPath")
+    .attr("id", (d, i) => `cut-off-${i}`)
+      .append("rect")
+      .attr("x", d => getX(d)(Number(d['Market value'].split(',').join(''))) + axisStep)
+      .attr("y", d => getY(d)(d['Fee'] === '?' ? 0 : d['Fee']) - axisStep / 4 - 5)
+      .attr("width", "7")
+      .attr("height", "10");
+
+  svg.append("g")
+    .selectAll()
+    .data(data)
+    .join("clipPath")
+    .attr("id", (d, i) => `cut-off2-${i}`)
+      .append("rect")
+      .attr("x", d => getX(d)(Number(d['Market value'].split(',').join(''))) + axisStep - 7)
+      .attr("y", d => getY(d)(d['Fee'] === '?' ? 0 : d['Fee']) - axisStep / 4 - 5)
+      .attr("width", "7")
+      .attr("height", "10");
+
+  svg.append("g")
+    .attr("stroke", "#000")
+    .attr("stroke-opacity", 0.2)
+      .selectAll()
+      .data(data)
+      .join("circle")
+        .attr("cx", d => getX(d)(Number(d['Market value'].split(',').join(''))) + axisStep)
+        .attr("cy", d => getY(d)(d['Fee'] === '?' ? 0 : d['Fee']) - axisStep / 4)
+        .attr("fill", d => getToColor(d))
+        .attr("clip-path", (d, i) => `url(#cut-off-${i})`)
+        .attr("r", 5)
+
+  svg.append("g")
   .attr("stroke", "#000")
   .attr("stroke-opacity", 0.2)
     .selectAll()
     .data(data)
     .join("circle")
-      .attr("cx", d => getX(d)(d['Market value']) + axisStep)
-      .attr("cy", d => getY(d)(d['Fee']) - axisStep / 4)
-      .attr("fill", d => color(d['Fee']))
-      .attr("clip-path", (d, i) => `url(#cut-off-${i})`)
+      .attr("cx", d => getX(d)(Number(d['Market value'].split(',').join(''))) + axisStep)
+      .attr("cy", d => getY(d)(d['Fee'] === '?' ? 0 : d['Fee']) - axisStep / 4)
+      .attr("fill", d => getFromColor(d))
+      .attr("clip-path", (d, i) => `url(#cut-off2-${i})`)
       .attr("r", 5)
+}
 
-svg.append("g")
-.attr("stroke", "#000")
-.attr("stroke-opacity", 0.2)
-  .selectAll()
-  .data(data)
-  .join("circle")
-    .attr("cx", d => getX(d)(d['Market value']) + axisStep)
-    .attr("cy", d => getY(d)(d['Fee']) - axisStep / 4)
-    .attr("fill", d => color2(d['Fee']))
-    .attr("clip-path", (d, i) => `url(#cut-off2-${i})`)
-    .attr("r", 5)
-      
+const getCsv = async () => {
+  const data = await d3.csv('./football-transfers.csv');
+  // console.log(data);
 
+  // const testData = data.splice(0, 200);
+  // console.log(testData);
+  // createPoints(data);
 
+  let filteredByCountry = [];
+  const filteredByType = data.filter(d => 
+    d[typeField] === inType || d[typeField] === insideType || d[typeField] === outType);
+
+  filteredByCountry = filteredByType.filter(d => 
+    d[fromCountryField] === 'Germany' 
+    && d[toRegionField] === region 
+    && d[fromRegionField] !== region
+  );
+
+  console.log(filteredByCountry);
+  createPoints(filteredByCountry);
+}
+
+getCsv();
