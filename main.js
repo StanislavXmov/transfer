@@ -457,7 +457,7 @@ const getCsv = async () => {
   });
 }
 
-getCsv();
+// getCsv();
 
 const clearGraph = (id, type) => {
   const el = document.querySelector(id);

@@ -4,7 +4,7 @@ const data = [
   {'Market value': 2000, 'Fee': 1000},
   {'Market value': 100_000, 'Fee': 100_000},
   {'Market value': 10000, 'Fee': 10000},
-  {'Market value': 12000, 'Fee': 12000},
+  {'Market value': 500000, 'Fee': 500000},
   {'Market value': 100_000, 'Fee': 0},
   {'Market value': 1_000_000, 'Fee': 2_000_000},
 ];
@@ -13,6 +13,8 @@ console.log(data);
 
 const color = d3.scaleSequential()
   .interpolator(d3.interpolateCool);
+const color2 = d3.scaleSequential()
+  .interpolator(d3.interpolateBlues);
 
 const axisData = [0, 10_000, 100_000, 1_000_000, 10_000_000, 100_000_000, 1_000_000_000];
 const axisStep = 75;
@@ -76,6 +78,27 @@ const getY = (d) => {
   }
 }
 
+svg.append("g")
+  .selectAll()
+  .data(data)
+  .join("clipPath")
+  .attr("id", (d, i) => `cut-off-${i}`)
+    .append("rect")
+    .attr("x", d => getX(d)(d['Market value']) + axisStep)
+    .attr("y", d => getY(d)(d['Fee']) - axisStep / 4 - 5)
+    .attr("width", "7")
+    .attr("height", "10");
+
+svg.append("g")
+  .selectAll()
+  .data(data)
+  .join("clipPath")
+  .attr("id", (d, i) => `cut-off2-${i}`)
+    .append("rect")
+    .attr("x", d => getX(d)(d['Market value']) + axisStep - 7)
+    .attr("y", d => getY(d)(d['Fee']) - axisStep / 4 - 5)
+    .attr("width", "7")
+    .attr("height", "10");
 
 svg.append("g")
   .attr("stroke", "#000")
@@ -86,6 +109,20 @@ svg.append("g")
       .attr("cx", d => getX(d)(d['Market value']) + axisStep)
       .attr("cy", d => getY(d)(d['Fee']) - axisStep / 4)
       .attr("fill", d => color(d['Fee']))
-      .attr("r", 5);
+      .attr("clip-path", (d, i) => `url(#cut-off-${i})`)
+      .attr("r", 5)
+
+svg.append("g")
+.attr("stroke", "#000")
+.attr("stroke-opacity", 0.2)
+  .selectAll()
+  .data(data)
+  .join("circle")
+    .attr("cx", d => getX(d)(d['Market value']) + axisStep)
+    .attr("cy", d => getY(d)(d['Fee']) - axisStep / 4)
+    .attr("fill", d => color2(d['Fee']))
+    .attr("clip-path", (d, i) => `url(#cut-off2-${i})`)
+    .attr("r", 5)
+      
 
 
