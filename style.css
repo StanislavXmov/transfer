@@ -47,6 +47,7 @@ body {
 }
 
 .transferContainer {
+  position: relative;
   margin: 16px auto 0;
   width: 100%;
   border: 2px dashed #c1c2c1;
@@ -89,4 +90,22 @@ body {
 
 #changeGraph {
   cursor: pointer;
+}
+
+.transferInfo {
+  display: none;
+  position: absolute;
+  padding: 8px;
+  border: 1px solid #c1c1c1;
+  z-index: 100;
+  background: #FFFFFF;
+}
+
+.table {
+  display: grid;
+  grid-template-columns: 100px auto;
+}
+
+.bold, #marketValue, #fee {
+  font-weight: bold;
 }

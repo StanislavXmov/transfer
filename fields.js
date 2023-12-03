@@ -34,6 +34,10 @@ export const toLeagueField = "To League";
 export const toLevelField = "To Level";
 export const toTeamField = "To Team";
 
+export const marketValueField ='Market value';
+export const feeField ='Fee';
+export const ageField ='Age';
+
 export const outType = 'Out';
 export const inType = 'In';
 export const insideType = 'Inside';

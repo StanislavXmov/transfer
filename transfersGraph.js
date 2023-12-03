@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { fromCountryField, fromRegionField, inType, insideType, outType, region, toRegionField, typeField } from './fields';
+import { feeField, fromCountryField, fromLeagueField, fromRegionField, fromTeamField, inType, insideType, marketValueField, outType, playerField, region, toCountryField, toLeagueField, toRegionField, toTeamField, typeField } from './fields';
 
 const colors = {
   'Top': '#FEFEFE',
@@ -11,6 +11,19 @@ const colors = {
   'No club': '#C1C1C1',
   'Retired': '#C1C1C1',
 };
+
+const transferInfo = document.getElementById('transferInfo');
+// const info = document.getElementById('info');
+const name = document.getElementById('name');
+const fromTeam = document.getElementById('fromTeam');
+const age = document.getElementById('age');
+const fromLeague = document.getElementById('fromLeague');
+const fromCountry = document.getElementById('fromCountry');
+const toTeam = document.getElementById('toTeam');
+const toLeague = document.getElementById('toLeague');
+const toCountry = document.getElementById('toCountry');
+const marketValue = document.getElementById('marketValue');
+const fee = document.getElementById('fee');
 
 const axisData = [0, 10_000, 100_000, 1_000_000, 10_000_000, 100_000_000, 1_000_000_000];
 const axisStep = 75;
@@ -59,7 +72,7 @@ Object.keys(axis.y).forEach(key => {
 const getX = (d) => {
   for (let j = axisData.length - 1; j >= 0; j--) {
     const x = axisData[j - 1];
-    const v = Number(d['Market value'].split(',').join(''));
+    const v = Number(d[marketValueField].split(',').join(''));
     if (v >= x) {
       return axis.x[x];
     }
@@ -69,10 +82,10 @@ const getX = (d) => {
 const getY = (d) => {
   for (let j = axisData.length - 1; j >= 0; j--) {
     let y = axisData[j - 1];
-    if (d['Fee'] === '?') {
+    if (d[feeField] === '?') {
       return axis.y['0'];
     }
-    if (d['Fee'] >= y) {
+    if (d[feeField] >= y) {
       return axis.y[y];
     }
   }
@@ -86,6 +99,37 @@ const getToColor = (d) => {
   return colors[d[toRegionField]] || colors['No club'];
 }
 
+let dataState = [];
+let selected = '-1';
+
+const circleOver = (e) => {
+  if (e.target.dataset.index && selected !== e.target.dataset.index) {
+    selected = e.target.dataset.index;
+    const d = dataState[Number(e.target.dataset.index)];
+    if (d) {
+      transferInfo.style.display = 'block';
+      transferInfo.style.left = `${e.target.cx.baseVal.value + 10}px`;
+      transferInfo.style.top = `${e.target.cy.baseVal.value}px`;
+      // info.textContent = JSON.stringify(d);
+      name.textContent = d[playerField];
+      age.textContent = d['Age'];
+      fromTeam.textContent = d[fromTeamField];
+      fromLeague.textContent = d[fromLeagueField];
+      fromCountry.textContent = d[fromCountryField];
+      toTeam.textContent = d[toTeamField];
+      toLeague.textContent = d[toLeagueField];
+      toCountry.textContent = d[toCountryField];
+      marketValue.textContent = Number(d[marketValueField].split(',').join('')).toLocaleString();
+      fee.textContent = Number(d[feeField]).toLocaleString();
+    }
+  }
+}
+
+const circleOut = (e) => {
+  transferInfo.style.display = 'none';
+  selected = '-1';
+}
+
 const createPoints = (data) => {
   svg.append("g")
     .selectAll()
@@ -93,8 +137,8 @@ const createPoints = (data) => {
     .join("clipPath")
     .attr("id", (d, i) => `cut-off-${i}`)
       .append("rect")
-      .attr("x", d => getX(d)(Number(d['Market value'].split(',').join(''))) + axisStep)
-      .attr("y", d => getY(d)(d['Fee'] === '?' ? 0 : d['Fee']) - axisStep / 4 - 5)
+      .attr("x", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + axisStep)
+      .attr("y", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 5)
       .attr("width", "7")
       .attr("height", "10");
 
@@ -104,42 +148,48 @@ const createPoints = (data) => {
     .join("clipPath")
     .attr("id", (d, i) => `cut-off2-${i}`)
       .append("rect")
-      .attr("x", d => getX(d)(Number(d['Market value'].split(',').join(''))) + axisStep - 7)
-      .attr("y", d => getY(d)(d['Fee'] === '?' ? 0 : d['Fee']) - axisStep / 4 - 5)
+      .attr("x", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + axisStep - 7)
+      .attr("y", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 5)
       .attr("width", "7")
       .attr("height", "10");
 
   svg.append("g")
+    .on('mouseover', circleOver)
+    .on('mouseout', circleOut)
     .attr("stroke", "#000")
     .attr("stroke-opacity", 0.2)
       .selectAll()
       .data(data)
       .join("circle")
-        .attr("cx", d => getX(d)(Number(d['Market value'].split(',').join(''))) + axisStep)
-        .attr("cy", d => getY(d)(d['Fee'] === '?' ? 0 : d['Fee']) - axisStep / 4)
+        .attr("cx", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + axisStep)
+        .attr("cy", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4)
         .attr("fill", d => getToColor(d))
         .attr("clip-path", (d, i) => `url(#cut-off-${i})`)
         .attr("r", 5)
+        .attr("data-index", (d, i) => i);
 
   svg.append("g")
+  .on('mouseover', circleOver)
+  .on('mouseout', circleOut)
   .attr("stroke", "#000")
   .attr("stroke-opacity", 0.2)
     .selectAll()
     .data(data)
     .join("circle")
-      .attr("cx", d => getX(d)(Number(d['Market value'].split(',').join(''))) + axisStep)
-      .attr("cy", d => getY(d)(d['Fee'] === '?' ? 0 : d['Fee']) - axisStep / 4)
+      .attr("cx", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + axisStep)
+      .attr("cy", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4)
       .attr("fill", d => getFromColor(d))
       .attr("clip-path", (d, i) => `url(#cut-off2-${i})`)
       .attr("r", 5)
+      .attr("data-index", (d, i) => i);
 }
+
 
 const getCsv = async () => {
   const data = await d3.csv('./football-transfers.csv');
   // console.log(data);
 
-  // const testData = data.splice(0, 200);
-  // console.log(testData);
+  // dataState = data;
   // createPoints(data);
 
   let filteredByCountry = [];
@@ -153,6 +203,7 @@ const getCsv = async () => {
   );
 
   console.log(filteredByCountry);
+  dataState = filteredByCountry;
   createPoints(filteredByCountry);
 }
 
