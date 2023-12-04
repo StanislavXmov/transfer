@@ -48,7 +48,7 @@ body {
 
 .transferContainer {
   position: relative;
-  margin: 16px auto 0;
+  margin: 16px auto 64px;
   width: 100%;
   border: 2px dashed #c1c2c1;
 }

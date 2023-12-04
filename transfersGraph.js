@@ -132,6 +132,7 @@ const circleOut = (e) => {
 
 const createPoints = (data) => {
   svg.append("g")
+    .attr("id", "group1")
     .selectAll()
     .data(data)
     .join("clipPath")
@@ -143,6 +144,7 @@ const createPoints = (data) => {
       .attr("height", "10");
 
   svg.append("g")
+    .attr("id", "group2")
     .selectAll()
     .data(data)
     .join("clipPath")
@@ -154,6 +156,7 @@ const createPoints = (data) => {
       .attr("height", "10");
 
   svg.append("g")
+    .attr("id", "group3")
     .on('mouseover', circleOver)
     .on('mouseout', circleOut)
     .attr("stroke", "#000")
@@ -169,6 +172,7 @@ const createPoints = (data) => {
         .attr("data-index", (d, i) => i);
 
   svg.append("g")
+  .attr("id", "group4")
   .on('mouseover', circleOver)
   .on('mouseout', circleOut)
   .attr("stroke", "#000")
@@ -184,6 +188,49 @@ const createPoints = (data) => {
       .attr("data-index", (d, i) => i);
 }
 
+const clearGraph = () => {
+  // #transferContainer
+  const group1 = document.querySelector('#group1');
+  const group2 = document.querySelector('#group2');
+  const group3 = document.querySelector('#group3');
+  const group4 = document.querySelector('#group4');
+  group1 && group1.remove();
+  group2 && group2.remove();
+  group3 && group3.remove();
+  group4 && group4.remove();
+}
+
+export const setPointData = (data, firstFilter) => {
+  clearGraph();
+
+  let filtered = [];
+  console.log({firstFilter});
+
+  if (firstFilter) {
+
+    const filteredByType = data.filter(d => 
+      d[typeField] === inType || d[typeField] === insideType || d[typeField] === outType);
+    filtered = filteredByType.filter(d => 
+      (d[fromRegionField] === region && 
+      d[toRegionField] === firstFilter) ||
+      (d[toRegionField] === region && 
+      d[fromRegionField] === firstFilter)
+    );
+    console.log(filtered.length);
+    dataState = filtered;
+    createPoints(filtered);
+  } else {
+    
+    filtered = data.filter(d => 
+      d[fromRegionField] === region ||
+      d[toRegionField] === region
+    );
+
+    console.log(filtered.length);
+    dataState = filtered;
+    createPoints(filtered);
+  }
+}
 
 const getCsv = async () => {
   const data = await d3.csv('./football-transfers.csv');
@@ -192,19 +239,19 @@ const getCsv = async () => {
   // dataState = data;
   // createPoints(data);
 
-  let filteredByCountry = [];
+  let filtered = [];
   const filteredByType = data.filter(d => 
     d[typeField] === inType || d[typeField] === insideType || d[typeField] === outType);
 
-  filteredByCountry = filteredByType.filter(d => 
+  filtered = filteredByType.filter(d => 
     d[fromCountryField] === 'Germany' 
     && d[toRegionField] === region 
     && d[fromRegionField] !== region
   );
 
-  console.log(filteredByCountry);
-  dataState = filteredByCountry;
-  createPoints(filteredByCountry);
+  console.log(filtered);
+  dataState = filtered;
+  createPoints(filtered);
 }
 
-getCsv();
+// getCsv();

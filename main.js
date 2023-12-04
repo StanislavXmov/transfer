@@ -2,7 +2,7 @@ import * as d3 from 'd3';
 import { sankey, sankeyLinkHorizontal } from 'd3-sankey';
 import './style.css';
 
-import './transfersGraph';
+import { setPointData } from './transfersGraph';
 
 import { filterByCountryToTop } from './filterByCountryToTop';
 import { filterByTopToCountry } from './filterByTopToCountry';
@@ -356,6 +356,8 @@ const getCsv = async () => {
 
   renderGraph(leftData, rightData, data);
 
+  setPointData(data);
+
   onChangeElement.addEventListener('change', (e) => {
     
     if (!firstFilter) {
@@ -423,6 +425,7 @@ const getCsv = async () => {
     secondFilter = null;
     thirdFilter = null;
     
+    setPointData(data);
   });
 
   filterStep2Button.addEventListener('click', () => {
@@ -457,7 +460,7 @@ const getCsv = async () => {
   });
 }
 
-// getCsv();
+getCsv();
 
 const clearGraph = (id, type) => {
   const el = document.querySelector(id);
@@ -614,6 +617,7 @@ const createGraph = (id, type, graph, height, data) => {
           if (regionsOrder.includes(d.name)) {
             firstFilter = d.name;
             showRegionsGraphs(data, d);
+            setPointData(data, firstFilter);
           } else if (countries.has(d.name)) {
             secondFilter = d.name;
             showCountriesGraphs(data, d, firstFilter);
