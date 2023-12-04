@@ -438,6 +438,8 @@ const getCsv = async () => {
 
     secondFilter = null;
     thirdFilter = null;
+
+    setPointData(data, firstFilter);
   });
 
   filterStep3Button.addEventListener('click', () => {
@@ -621,6 +623,7 @@ const createGraph = (id, type, graph, height, data) => {
           } else if (countries.has(d.name)) {
             secondFilter = d.name;
             showCountriesGraphs(data, d, firstFilter);
+            setPointData(data, firstFilter, secondFilter);
           } else if (leaguesKey.includes(d.name)) {
             thirdFilter = d.name;
             showTeamsGraphs(data, d, firstFilter, secondFilter);

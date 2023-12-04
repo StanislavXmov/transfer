@@ -200,13 +200,38 @@ const clearGraph = () => {
   group4 && group4.remove();
 }
 
-export const setPointData = (data, firstFilter) => {
+export const setPointData = (data, firstFilter, secondFilter) => {
   clearGraph();
 
   let filtered = [];
-  console.log({firstFilter});
+  console.log({firstFilter, secondFilter});
 
-  if (firstFilter) {
+  if (firstFilter && secondFilter) {
+    const filteredByType = data.filter(d => 
+      d[typeField] === inType || d[typeField] === insideType || d[typeField] === outType);
+    if (firstFilter === region) {
+      const filteredByRegions = filteredByType.filter(d => 
+        d[fromRegionField] === region 
+        && d[toRegionField] === region
+      );
+      filtered = filteredByRegions.filter(d => 
+        d[fromCountryField] === secondFilter ||
+        d[toCountryField] === secondFilter
+      );
+    } else {
+      filtered = filteredByType.filter(d => 
+        (d[fromCountryField] === secondFilter 
+        && d[toRegionField] === region 
+        && d[fromRegionField] !== region) ||
+        (d[toCountryField] === secondFilter 
+        && d[toRegionField] === region 
+        && d[fromRegionField] !== region)
+      );
+    }
+    console.log(filtered.length);
+    dataState = filtered;
+    createPoints(filtered);
+  } else if (firstFilter) {
 
     const filteredByType = data.filter(d => 
       d[typeField] === inType || d[typeField] === insideType || d[typeField] === outType);
