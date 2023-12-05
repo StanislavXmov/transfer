@@ -450,6 +450,8 @@ const getCsv = async () => {
     filterStep4Button.style.display = 'none';
 
     thirdFilter = null;
+
+    setPointData(data, firstFilter, secondFilter);
   });
 
   filterStep4Button.addEventListener('click', () => {
@@ -459,6 +461,8 @@ const getCsv = async () => {
     filterStep4Button.style.display = 'none';
 
     fourthFilter = null;
+
+    setPointData(data, firstFilter, secondFilter, thirdFilter);
   });
 }
 
@@ -627,9 +631,11 @@ const createGraph = (id, type, graph, height, data) => {
           } else if (leaguesKey.includes(d.name)) {
             thirdFilter = d.name;
             showTeamsGraphs(data, d, firstFilter, secondFilter);
+            setPointData(data, firstFilter, secondFilter, thirdFilter);
           } else if (teamsKey.includes(d.name)) {
             fourthFilter = d.name;
             showFootbollmanGraphs(data, d, firstFilter, secondFilter, thirdFilter);
+            setPointData(data, firstFilter, secondFilter, thirdFilter, fourthFilter);
           }
       }
       })

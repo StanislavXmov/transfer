@@ -200,13 +200,73 @@ const clearGraph = () => {
   group4 && group4.remove();
 }
 
-export const setPointData = (data, firstFilter, secondFilter) => {
+export const setPointData = (data, firstFilter, secondFilter, thirdFilter, fourthFilter) => {
   clearGraph();
 
   let filtered = [];
-  console.log({firstFilter, secondFilter});
+  console.log({firstFilter, secondFilter, thirdFilter, fourthFilter});
 
-  if (firstFilter && secondFilter) {
+  if (firstFilter && secondFilter && thirdFilter && fourthFilter) {
+    const filteredByType = data.filter(d => 
+      d[typeField] === inType || d[typeField] === insideType || d[typeField] === outType);
+    if (firstFilter === region) {
+      filtered = filteredByType.filter(d => 
+        (d[fromCountryField] === secondFilter
+        && d[fromRegionField] === region
+        && d[toRegionField] === region 
+        && d[fromLeagueField] === thirdFilter
+        && d[fromTeamField] === fourthFilter) ||
+        (d[toRegionField] === firstFilter
+        && d[fromRegionField] === region 
+        && d[toCountryField] === secondFilter 
+        && d[toLeagueField] === thirdFilter
+        && d[toTeamField] === fourthFilter)
+      );
+    } else {
+      filtered = filteredByType.filter(d => 
+        (d[fromCountryField] === secondFilter 
+        && d[toRegionField] === region 
+        && d[fromRegionField] !== region
+        && d[fromLeagueField] === thirdFilter
+        && d[fromTeamField] === fourthFilter) ||
+        (d[toRegionField] === firstFilter
+        && d[toCountryField] === secondFilter 
+        && d[toLeagueField] === thirdFilter
+        && d[toTeamField] === fourthFilter)
+      );
+    }
+
+    console.log(filtered.length);
+    dataState = filtered;
+    createPoints(filtered);
+  } else if (firstFilter && secondFilter && thirdFilter) {
+    const filteredByType = data.filter(d => 
+      d[typeField] === inType || d[typeField] === insideType || d[typeField] === outType);
+    if (firstFilter === region) {
+      const filteredByRegions = filteredByType.filter(d => 
+        d[fromRegionField] === region 
+        && d[toRegionField] === region
+      );
+
+      filtered = filteredByRegions.filter(d => 
+        (d[fromCountryField] === secondFilter && d[fromLeagueField] === thirdFilter ) ||
+        (d[toCountryField] === secondFilter && d[toLeagueField] === thirdFilter)
+      );
+    } else {
+      filtered = filteredByType.filter(d => 
+        (d[fromCountryField] === secondFilter 
+        && d[toRegionField] === region 
+        && d[fromRegionField] !== region
+        && d[fromLeagueField] === thirdFilter) ||
+        (d[toCountryField] === secondFilter 
+        && d[toRegionField] === firstFilter 
+        && d[toLeagueField] === thirdFilter)
+      );
+    }
+    console.log(filtered.length);
+    dataState = filtered;
+    createPoints(filtered);
+  } else if (firstFilter && secondFilter) {
     const filteredByType = data.filter(d => 
       d[typeField] === inType || d[typeField] === insideType || d[typeField] === outType);
     if (firstFilter === region) {
