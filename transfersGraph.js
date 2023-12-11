@@ -54,11 +54,14 @@ axisData.forEach((step, i) => {
 
 const svg = d3.select('#transferContainer').append("svg")
   .attr("width", width)
-  .attr("height", height)
+  .attr("height", height + 10)
   .attr("viewBox", [0, 0, width, height])
   // .attr("style", "max-width: 100%; height: auto;");
 
 Object.keys(axis.x).forEach(key => {
+  if (Number(key) === axisData[axisData.length - 2]) {
+    return;
+  }
   svg.append("g")
     .attr("transform", `translate(${axisStep},${height - axisStep / 4})`)
     .call(d3.axisBottom(axis.x[key]).ticks(1))
@@ -66,6 +69,9 @@ Object.keys(axis.x).forEach(key => {
 });
 
 Object.keys(axis.y).forEach(key => {
+  if (Number(key) === axisData[axisData.length - 2]) {
+    return;
+  }
   svg.append("g")
     .attr("transform", `translate(${axisStep}, ${- axisStep / 4})`)
     .call(d3.axisLeft(axis.y[key]).ticks(1))

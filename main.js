@@ -30,7 +30,8 @@ import { fromFootballmans } from './filter/checked/fromFootballmans';
 import { toFootballmans } from './filter/checked/toFootballmans';
 
 const container = document.getElementById('container');
-const clientWidth = (container.clientWidth - 400 - 16) / 2;
+const titleWidth = 150;
+const clientWidth = (container.clientWidth - (titleWidth * 2) - 16) / 2;
 
 const margin = {top: 10, right: 10, bottom: 10, left: 10};
 // const margin = {top: 0, right: 0, bottom: 0, left: 0};
@@ -563,7 +564,7 @@ const createGraph = (id, type, graph, height, data) => {
     // .data(nodes.filter(n => n.index !== 0))
     .join("span")
       .style("cursor", "pointer")
-      .style("width", "200px")
+      .style("width", `${titleWidth}px`)
       .style("position", "absolute")
       .style("line-height", d => {
         if (d.value < 10) {
@@ -587,11 +588,11 @@ const createGraph = (id, type, graph, height, data) => {
       .style("left", d => {
         if (type === 'left') {
           if (d.root && d.isLeagues) {
-            return `${370}px`;
+            return `${width - 10}px`;
           } else if (d.root) {
-            return `${d.x0 - 200}px`;
+            return `${d.x0 - titleWidth}px`;
           } else {
-            return `${d.x0 - 200}px`;
+            return `${d.x0 - titleWidth}px`;
           }
         } else {
           if (d.root && d.isLeagues) {

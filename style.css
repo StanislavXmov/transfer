@@ -16,7 +16,7 @@ body {
 }
 
 .titleWrapper {
-  margin-top: 32px;
+  margin: 32px 0 16px;
   display: grid;
   grid-template-columns: 2fr 1fr 2fr;
 }
@@ -58,14 +58,14 @@ body {
 }
 
 .graphLeft {
-  padding-left: 200px;
+  padding-left: 150px;
   display: flex;
   justify-content: center;
   /* border: 1px dashed #0000002e; */
 }
 
 .graphRight {
-  padding-right: 200px;
+  padding-right: 150px;
   display: flex;
   justify-content: center;
   /* border: 1px dashed #0000002e; */
@@ -132,4 +132,8 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
+}
+
+svg g text {
+  font-size: 9px;
 }
