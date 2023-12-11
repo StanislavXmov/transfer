@@ -5,7 +5,7 @@
 body {
   margin: 0 auto;
   padding: 16px;
-  width: 1200px;
+  /* width: 1200px; */
   min-height: 100vh;
   font-family: sans-serif;
 }
@@ -38,19 +38,19 @@ body {
   text-align: right;
 }
 
-.container {
+/* .container {
   margin: 16px auto 0;
   width: 100%;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
-}
+} */
 
 .transferContainer {
   position: relative;
   margin: 16px auto 64px;
   width: 100%;
-  border: 2px dashed #c1c2c1;
+  /* border: 2px dashed #c1c2c1; */
 }
 
 #graphLeft, #graphRight {
@@ -58,14 +58,14 @@ body {
 }
 
 .graphLeft {
-  /* padding-left: 100px; */
+  padding-left: 200px;
   display: flex;
   justify-content: center;
   /* border: 1px dashed #0000002e; */
 }
 
 .graphRight {
-  /* padding-right: 100px; */
+  padding-right: 200px;
   display: flex;
   justify-content: center;
   /* border: 1px dashed #0000002e; */
@@ -108,4 +108,28 @@ body {
 
 .bold, #marketValue, #fee {
   font-weight: bold;
+}
+
+.wrapper {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+
+.box {
+ border: 2px dashed black;
+}
+
+@media (max-width: 1200px) {
+  .wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
 }

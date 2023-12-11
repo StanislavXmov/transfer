@@ -29,8 +29,12 @@ import { fromTeamsToFootballmansOut } from './filter/footballmans/fromTeamsToFoo
 import { fromFootballmans } from './filter/checked/fromFootballmans';
 import { toFootballmans } from './filter/checked/toFootballmans';
 
+const container = document.getElementById('container');
+const clientWidth = (container.clientWidth - 400 - 16) / 2;
+
 const margin = {top: 10, right: 10, bottom: 10, left: 10};
-const width = 400 - margin.left - margin.right;
+// const margin = {top: 0, right: 0, bottom: 0, left: 0};
+const width = clientWidth - margin.left - margin.right;
 const height = 640 - margin.top - margin.bottom;
 const onChangeElement = document.getElementById('changeGraph');
 const changeGraphLabelElement = document.getElementById('changeGraphLabel');

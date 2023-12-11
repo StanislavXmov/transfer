@@ -11,7 +11,8 @@ const colors = {
   'No club': '#C1C1C1',
   'Retired': '#C1C1C1',
 };
-
+const container = document.getElementById('transferContainer');
+const clientWidth = container.clientWidth;
 const transferInfo = document.getElementById('transferInfo');
 // const info = document.getElementById('info');
 const name = document.getElementById('name');
@@ -26,7 +27,9 @@ const marketValue = document.getElementById('marketValue');
 const fee = document.getElementById('fee');
 
 const axisData = [0, 10_000, 100_000, 1_000_000, 10_000_000, 100_000_000, 1_000_000_000];
-const axisStep = 75;
+// min 45;
+// const axisStep = 75;
+const axisStep = Math.round(clientWidth / 8);
 
 const width = (axisData.length - 1) * axisStep + axisStep;
 const height = (axisData.length - 1) * axisStep + axisStep;
@@ -53,7 +56,7 @@ const svg = d3.select('#transferContainer').append("svg")
   .attr("width", width)
   .attr("height", height)
   .attr("viewBox", [0, 0, width, height])
-  .attr("style", "max-width: 100%; height: auto;");
+  // .attr("style", "max-width: 100%; height: auto;");
 
 Object.keys(axis.x).forEach(key => {
   svg.append("g")
