@@ -117,8 +117,15 @@ const circleOver = (e) => {
     const d = dataState[Number(e.target.dataset.index)];
     if (d) {
       transferInfo.style.display = 'block';
-      transferInfo.style.left = `${e.target.cx.baseVal.value + 10}px`;
-      transferInfo.style.top = `${e.target.cy.baseVal.value}px`;
+      if (document.body.clientWidth <= 1200) {
+        transferInfo.style.left = `${e.target.cx.baseVal.value + 10}px`;
+        transferInfo.style.top = `${e.target.cy.baseVal.value}px`;
+      } else {
+        transferInfo.style.width = `320px`;
+        transferInfo.style.left = `${e.target.cx.baseVal.value - 330}px`;
+        transferInfo.style.top = `${e.target.cy.baseVal.value}px`;
+      }
+      
       // info.textContent = JSON.stringify(d);
       name.textContent = d[playerField];
       age.textContent = d['Age'];
@@ -245,7 +252,7 @@ export const setPointData = (data, firstFilter, secondFilter, thirdFilter, fourt
       );
     }
 
-    console.log(filtered.length);
+    // console.log(filtered.length);
     dataState = filtered;
     createPoints(filtered);
   } else if (firstFilter && secondFilter && thirdFilter) {
@@ -272,7 +279,7 @@ export const setPointData = (data, firstFilter, secondFilter, thirdFilter, fourt
         && d[toLeagueField] === thirdFilter)
       );
     }
-    console.log(filtered.length);
+    // console.log(filtered.length);
     dataState = filtered;
     createPoints(filtered);
   } else if (firstFilter && secondFilter) {
@@ -293,11 +300,12 @@ export const setPointData = (data, firstFilter, secondFilter, thirdFilter, fourt
         && d[toRegionField] === region 
         && d[fromRegionField] !== region) ||
         (d[toCountryField] === secondFilter 
-        && d[toRegionField] === region 
-        && d[fromRegionField] !== region)
+        && d[toRegionField] === firstFilter 
+        // && d[fromRegionField] !== region
+        )
       );
     }
-    console.log(filtered.length);
+    // console.log(filtered.length);
     dataState = filtered;
     createPoints(filtered);
   } else if (firstFilter) {
@@ -310,7 +318,7 @@ export const setPointData = (data, firstFilter, secondFilter, thirdFilter, fourt
       (d[toRegionField] === region && 
       d[fromRegionField] === firstFilter)
     );
-    console.log(filtered.length);
+    // console.log(filtered.length);
     dataState = filtered;
     createPoints(filtered);
   } else {
@@ -320,7 +328,7 @@ export const setPointData = (data, firstFilter, secondFilter, thirdFilter, fourt
       d[toRegionField] === region
     );
 
-    console.log(filtered.length);
+    // console.log(filtered.length);
     dataState = filtered;
     createPoints(filtered);
   }
