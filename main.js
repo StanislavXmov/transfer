@@ -30,7 +30,7 @@ import { fromFootballmans } from './filter/checked/fromFootballmans';
 import { toFootballmans } from './filter/checked/toFootballmans';
 
 const container = document.getElementById('container');
-const titleWidth = 150;
+const titleWidth = 100;
 const clientWidth = (container.clientWidth - (titleWidth * 2) - 16) / 2;
 
 const margin = {top: 10, right: 10, bottom: 10, left: 10};
@@ -567,16 +567,18 @@ const createGraph = (id, type, graph, height, data) => {
       .style("width", `${titleWidth}px`)
       .style("position", "absolute")
       .style("line-height", d => {
-        if (d.value < 10) {
-          return "12px";
-        }
-        return "14px";
+        // if (d.value < 10) {
+        //   return "12px";
+        // }
+        // return "14px";
+        return "12px";
       })
       .style("font-size", d => {
-        if (d.value < 10) {
-          return "12px";
-        }
-        return "16px";
+        // if (d.value < 10) {
+        //   return "12px";
+        // }
+        // return "16px";
+        return "12px";
       })
       .style("top", d => {
         if (d.root && d.isLeagues) {
