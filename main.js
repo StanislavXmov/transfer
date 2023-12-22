@@ -31,7 +31,7 @@ import { toFootballmans } from './filter/checked/toFootballmans';
 
 const container = document.getElementById('container');
 const titleWidth = 100;
-const clientWidth = (container.clientWidth - (titleWidth * 2) - 16) / 2;
+const clientWidth = (container.clientWidth - (titleWidth * 2) - 0) / 2;
 
 const margin = {top: 10, right: 10, bottom: 10, left: 10};
 // const margin = {top: 0, right: 0, bottom: 0, left: 0};
@@ -571,6 +571,10 @@ const createGraph = (id, type, graph, height, data) => {
         //   return "12px";
         // }
         // return "14px";
+        // return "12px";
+        if (d.name.length > 20) {
+          return "10px";
+        }
         return "12px";
       })
       .style("font-size", d => {
@@ -578,6 +582,10 @@ const createGraph = (id, type, graph, height, data) => {
         //   return "12px";
         // }
         // return "16px";
+        // return "12px";
+        if (d.name.length > 20) {
+          return "10px";
+        }
         return "12px";
       })
       .style("top", d => {
