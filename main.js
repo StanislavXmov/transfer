@@ -7,7 +7,7 @@ import { setPointData } from './transfersGraph';
 import { filterByCountryToTop } from './filterByCountryToTop';
 import { filterByTopToCountry } from './filterByTopToCountry';
 
-import { countries, europeLeft, europeRight, regionsOrder } from './order';
+import { countries, europeLeft, europeRight, regionsOrder, top } from './order';
 import { toTopInInside } from './filter/toTopInInside';
 import { fromTopOutInside } from './filter/fromTopOutInside';
 import { fromRegionInInsideToLegueTop } from './filter/fromRegionInInsideToLegueTop';
@@ -19,7 +19,7 @@ import { fromCountries } from './filter/checked/fromCountries';
 import { toCountries } from './filter/checked/toCountries';
 import { fromLegues } from './filter/checked/fromLegues';
 import { toLeagues } from './filter/checked/toLeagues';
-import { fromLeagueField, fromTeamField, toLeagueField, toTeamField } from './fields';
+import { fromLeagueField, fromTeamField, region, toLeagueField, toTeamField } from './fields';
 import { fromLeagueToTeams } from './filter/teams/fromLeagueToTeams';
 import { fromLeagueToTeamsOut } from './filter/teams/fromLeagueToTeamsOut';
 import { fromTeams } from './filter/checked/fromTeams';
@@ -28,6 +28,7 @@ import { fromTeamsToFootballmans } from './filter/footballmans/fromTeamsToFootba
 import { fromTeamsToFootballmansOut } from './filter/footballmans/fromTeamsToFootballmansOut';
 import { fromFootballmans } from './filter/checked/fromFootballmans';
 import { toFootballmans } from './filter/checked/toFootballmans';
+import { colors } from './transfersGraph';
 
 const container = document.getElementById('container');
 const titleWidth = 100;
@@ -423,6 +424,11 @@ const getCsv = async () => {
   });
 
   filterStep1Button.addEventListener('click', () => {
+    firstFilter = null;
+    secondFilter = null;
+    thirdFilter = null;
+    fourthFilter = null;
+
     createGraphs(datas.top.left, datas.top.right, data);
     onChangeElement.disabled = false;
     changeGraphLabelElement.style.opacity = 1;
@@ -431,11 +437,6 @@ const getCsv = async () => {
     filterStep3Button.style.display = 'none';
     filterStep4Button.style.display = 'none';
 
-    firstFilter = null;
-    secondFilter = null;
-    thirdFilter = null;
-    fourthFilter = null;
-    
     setPointData(data);
   });
 
@@ -534,6 +535,23 @@ const createGraph = (id, type, graph, height, data) => {
     .attr("stroke-width", d => Math.max(1, d.width))
     // test color
     // .attr("stroke", d => `url(#${d.index}Link)`)
+    .attr("stroke", d => {
+      console.log(firstFilter);
+      // return "#FFFFFF";
+      
+      if (!firstFilter) {
+        if (d.source.name === region) {
+          return '#00000020';
+        }
+        return colors[d.source.name];
+      } else if (firstFilter) {
+        if (firstFilter === region) {
+          return '#00000020';
+        }
+        return colors[firstFilter];
+      }
+      return "#000000";
+    })
     .style("cursor", "pointer")
     .on('mouseover', (e, d) => {
       d3.select(e.target).style("opacity", 0.8);

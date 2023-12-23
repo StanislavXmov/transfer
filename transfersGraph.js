@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import { feeField, fromCountryField, fromLeagueField, fromRegionField, fromTeamField, inType, insideType, marketValueField, outType, playerField, region, toCountryField, toLeagueField, toRegionField, toTeamField, typeField } from './fields';
 
-const colors = {
+export const colors = {
   'Top': '#FEFEFE',
   'Europe, ex. Top Leagues': '#1FB35F',
   'Asia': '#F051AE',
