@@ -326,8 +326,12 @@ const renderGraph = (leftData, rightData, data) => {
     rightHeight = rightData.transfers / n + dhR;
   }
 
-  createGraph(graphLeftId, left, leftData, leftHeight, data);
-  createGraph(graphRightId, right, rightData, rightHeight, data);
+  if (leftData.links.length > 0) {
+    createGraph(graphLeftId, left, leftData, leftHeight, data);
+  }
+  if (rightData.links.length > 0) {
+    createGraph(graphRightId, right, rightData, rightHeight, data);
+  }
 }
 
 const datas = {};
@@ -409,6 +413,7 @@ const getCsv = async () => {
       if (!e.target.checked) {
         const nextLeftData = fromCountries(data, firstFilter);
         const nextRightData = toCountries(data, firstFilter);
+        console.log({nextLeftData, nextRightData});
         showByLeagues(nextLeftData, nextRightData, data);
       } else {
         showRegionsGraphs(data, {name: firstFilter});
