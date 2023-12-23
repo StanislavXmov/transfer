@@ -536,14 +536,14 @@ const createGraph = (id, type, graph, height, data) => {
     // test color
     // .attr("stroke", d => `url(#${d.index}Link)`)
     .attr("stroke", d => {
-      console.log(firstFilter);
-      // return "#FFFFFF";
-      
       if (!firstFilter) {
         if (d.source.name === region) {
           return '#00000020';
         }
-        return colors[d.source.name];
+        if (colors[d.source.name]) {
+          return colors[d.source.name];
+        }
+        return '#00000020';
       } else if (firstFilter) {
         if (firstFilter === region) {
           return '#00000020';
