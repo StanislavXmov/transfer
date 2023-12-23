@@ -27,6 +27,15 @@ const marketValue = document.getElementById('marketValue');
 const fee = document.getElementById('fee');
 
 const axisData = [0, 10_000, 100_000, 1_000_000, 10_000_000, 100_000_000, 1_000_000_000];
+const axisDataString = {
+  "0": "0",
+  "10000": "10k",
+  "100000": "100k",
+  "1000000": "1M",
+  "10000000": "10M",
+  "100000000": "100M",
+  "1000000000": "1B",
+}
 // min 45;
 // const axisStep = 75;
 const axisStep = Math.round(clientWidth / 8);
@@ -64,7 +73,7 @@ Object.keys(axis.x).forEach(key => {
   }
   svg.append("g")
     .attr("transform", `translate(${axisStep},${height - axisStep / 4})`)
-    .call(d3.axisBottom(axis.x[key]).ticks(1))
+    .call(d3.axisBottom(axis.x[key]).ticks(1).tickFormat((d => `${axisDataString[d]}`)))
     .call(g => g.select(".domain").remove());
 });
 
@@ -74,7 +83,7 @@ Object.keys(axis.y).forEach(key => {
   }
   svg.append("g")
     .attr("transform", `translate(${axisStep}, ${- axisStep / 4})`)
-    .call(d3.axisLeft(axis.y[key]).ticks(1))
+    .call(d3.axisLeft(axis.y[key]).ticks(1).tickFormat((d => `${axisDataString[d]}`)))
     .call(g => g.select(".domain").remove());
 });
 
@@ -118,12 +127,16 @@ const circleOver = (e) => {
     if (d) {
       transferInfo.style.display = 'block';
       if (document.body.clientWidth <= 1200) {
-        transferInfo.style.left = `${e.target.cx.baseVal.value + 10}px`;
-        transferInfo.style.top = `${e.target.cy.baseVal.value}px`;
+        transferInfo.style.left = `${Number(e.target.dataset.left) + 10}px`;
+        transferInfo.style.top = `${Number(e.target.dataset.top)}px`
+        // transferInfo.style.left = `${e.target.cx.baseVal.value + 10}px`;
+        // transferInfo.style.top = `${e.target.cy.baseVal.value}px`;
       } else {
         transferInfo.style.width = `320px`;
-        transferInfo.style.left = `${e.target.cx.baseVal.value - 330}px`;
-        transferInfo.style.top = `${e.target.cy.baseVal.value}px`;
+        transferInfo.style.left = `${Number(e.target.dataset.left) - 330}px`;
+        transferInfo.style.top = `${Number(e.target.dataset.top)}px`;
+        // transferInfo.style.left = `${e.target.cx.baseVal.value - 330}px`;
+        // transferInfo.style.top = `${e.target.cy.baseVal.value}px`;
       }
       
       // info.textContent = JSON.stringify(d);
@@ -146,74 +159,48 @@ const circleOut = (e) => {
   selected = '-1';
 }
 
+const d1 = "M0 3C0 4.65685 1.34315 6 3 6V0C1.34315 0 0 1.34315 0 3Z";
+const d2 = "M3 6C4.65685 6 6 4.65685 6 3C6 1.34315 4.65685 0 3 0V6Z";
+
 const createPoints = (data) => {
   svg.append("g")
     .attr("id", "group1")
     .selectAll()
     .data(data)
-    .join("clipPath")
-    .attr("id", (d, i) => `cut-off-${i}`)
-      .append("rect")
-      .attr("x", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + axisStep)
-      .attr("y", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 5)
-      .attr("width", "7")
-      .attr("height", "10");
-
-  svg.append("g")
-    .attr("id", "group2")
-    .selectAll()
-    .data(data)
-    .join("clipPath")
-    .attr("id", (d, i) => `cut-off2-${i}`)
-      .append("rect")
-      .attr("x", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + axisStep - 7)
-      .attr("y", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 5)
-      .attr("width", "7")
-      .attr("height", "10");
-
-  svg.append("g")
-    .attr("id", "group3")
-    .on('mouseover', circleOver)
-    .on('mouseout', circleOut)
-    .attr("stroke", "#000")
-    .attr("stroke-opacity", 0.2)
-      .selectAll()
-      .data(data)
-      .join("circle")
-        .attr("cx", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + axisStep)
-        .attr("cy", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4)
+    .join("g")
+      .on('mouseover', circleOver)
+      .on('mouseout', circleOut)
+      .style("cursor", "pointer")
+      .attr("data-index", (d, i) => i)
+      .attr("data-left", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + axisStep - 3)
+      .attr("data-top", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3)
+      .attr("transform", d => `translate(${getX(d)(Number(d[marketValueField].split(',').join(''))) + axisStep - 3}, ${getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3})`)
+      .append("circle")
+      .attr("cx", 3)
+      .attr("cy", 3)
+      .attr("r", 3.5)
+      .attr("stroke", "#00000060")
+      .attr("fill", "none")
+      .select(function() { return this.parentNode; })
+      .append("path")
+        .attr("d", d1)
+        .attr("fill", d => getFromColor(d))
+        .attr("data-index", (d, i) => i)
+        .attr("data-left", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + axisStep - 3)
+        .attr("data-top", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3)
+        .select(function() { return this.parentNode; })
+        .append("path")
+        .attr("d", d2)
         .attr("fill", d => getToColor(d))
-        .attr("clip-path", (d, i) => `url(#cut-off-${i})`)
-        .attr("r", 5)
-        .attr("data-index", (d, i) => i);
-
-  svg.append("g")
-  .attr("id", "group4")
-  .on('mouseover', circleOver)
-  .on('mouseout', circleOut)
-  .attr("stroke", "#000")
-  .attr("stroke-opacity", 0.2)
-    .selectAll()
-    .data(data)
-    .join("circle")
-      .attr("cx", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + axisStep)
-      .attr("cy", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4)
-      .attr("fill", d => getFromColor(d))
-      .attr("clip-path", (d, i) => `url(#cut-off2-${i})`)
-      .attr("r", 5)
-      .attr("data-index", (d, i) => i);
+        .attr("data-index", (d, i) => i)
+        .attr("data-left", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + axisStep - 3)
+        .attr("data-top", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3);
 }
 
 const clearGraph = () => {
   // #transferContainer
   const group1 = document.querySelector('#group1');
-  const group2 = document.querySelector('#group2');
-  const group3 = document.querySelector('#group3');
-  const group4 = document.querySelector('#group4');
   group1 && group1.remove();
-  group2 && group2.remove();
-  group3 && group3.remove();
-  group4 && group4.remove();
 }
 
 export const setPointData = (data, firstFilter, secondFilter, thirdFilter, fourthFilter) => {
