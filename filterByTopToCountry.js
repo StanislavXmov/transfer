@@ -29,6 +29,8 @@ export const filterByTopToCountry = (data, selectedRegion) => {
     order = africa;
   } else if (selectedRegion === 'Top') {
     order = top;
+  } else if (selectedRegion === 'Retired') {
+    order = ['-'];
   }
 
   const filteredByType = data.filter(d => 
