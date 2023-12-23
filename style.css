@@ -31,6 +31,16 @@ body {
   }
 }
 
+.bottomTitleWrapper {
+  display: none;
+}
+
+@media (max-width: 1200px) {
+  .bottomTitleWrapper {
+    display: block;
+  }
+}
+
 .leftTitle {
   padding-left: 142px;
   text-align: left;
@@ -58,7 +68,7 @@ body {
 
 .transferContainer {
   position: relative;
-  margin: 16px auto 64px;
+  margin: 0 auto 64px;
   width: 100%;
   /* border: 2px dashed #c1c2c1; */
 }

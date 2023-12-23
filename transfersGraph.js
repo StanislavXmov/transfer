@@ -38,7 +38,9 @@ const axisDataString = {
 }
 // min 45;
 // const axisStep = 75;
-const axisStep = Math.round(clientWidth / 8);
+const axisStep = Math.round(clientWidth / 7);
+const paddingLeft = 32;
+const dy = axisStep * 1.65;
 
 const width = (axisData.length - 1) * axisStep + axisStep;
 const height = (axisData.length - 1) * axisStep + axisStep;
@@ -72,7 +74,7 @@ Object.keys(axis.x).forEach(key => {
     return;
   }
   svg.append("g")
-    .attr("transform", `translate(${axisStep},${height - axisStep / 4})`)
+    .attr("transform", `translate(${paddingLeft},${height - axisStep / 4 - dy })`)
     .call(d3.axisBottom(axis.x[key]).ticks(1).tickFormat((d => `${axisDataString[d]}`)))
     .call(g => g.select(".domain").remove());
 });
@@ -82,7 +84,7 @@ Object.keys(axis.y).forEach(key => {
     return;
   }
   svg.append("g")
-    .attr("transform", `translate(${axisStep}, ${- axisStep / 4})`)
+    .attr("transform", `translate(${paddingLeft}, ${- axisStep / 4  - dy })`)
     .call(d3.axisLeft(axis.y[key]).ticks(1).tickFormat((d => `${axisDataString[d]}`)))
     .call(g => g.select(".domain").remove());
 });
@@ -172,29 +174,36 @@ const createPoints = (data) => {
       .on('mouseout', circleOut)
       .style("cursor", "pointer")
       .attr("data-index", (d, i) => i)
-      .attr("data-left", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + axisStep - 3)
-      .attr("data-top", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3)
-      .attr("transform", d => `translate(${getX(d)(Number(d[marketValueField].split(',').join(''))) + axisStep - 3}, ${getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3})`)
+      .attr("data-left", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + paddingLeft - 3)
+      .attr("data-top", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy)
+      .attr("transform", d => `
+        translate(
+          ${getX(d)(Number(d[marketValueField].split(',').join(''))) + paddingLeft - 3}, 
+          ${getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy})
+        `)
       .append("circle")
       .attr("cx", 3)
       .attr("cy", 3)
       .attr("r", 3.5)
       .attr("stroke", "#00000060")
       .attr("fill", "none")
+      .attr("data-index", (d, i) => i)
+      .attr("data-left", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + paddingLeft - 3)
+      .attr("data-top", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy)
       .select(function() { return this.parentNode; })
       .append("path")
         .attr("d", d1)
         .attr("fill", d => getFromColor(d))
         .attr("data-index", (d, i) => i)
-        .attr("data-left", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + axisStep - 3)
-        .attr("data-top", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3)
+        .attr("data-left", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + paddingLeft - 3)
+        .attr("data-top", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy)
         .select(function() { return this.parentNode; })
         .append("path")
         .attr("d", d2)
         .attr("fill", d => getToColor(d))
         .attr("data-index", (d, i) => i)
-        .attr("data-left", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + axisStep - 3)
-        .attr("data-top", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3);
+        .attr("data-left", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + paddingLeft - 3)
+        .attr("data-top", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy);
 }
 
 const clearGraph = () => {
