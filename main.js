@@ -93,7 +93,7 @@ const createGraphs = (leftData, rightData, data) => {
 }
 
 const showRegionsGraphs = (data, node) => {
-  onChangeElement.checked = false;
+  onChangeElement.checked = true;
 
   // onChangeElement.disabled = true;
   // changeGraphLabelElement.style.opacity = 0.4;
@@ -135,7 +135,7 @@ const showRegionsGraphs = (data, node) => {
 }
 
 const showCountriesGraphs = (data, node, firstFilter) => {
-  onChangeElement.checked = false;
+  onChangeElement.checked = true;
 
   // onChangeElement.disabled = true;
   // changeGraphLabelElement.style.opacity = 0.4;
@@ -172,7 +172,7 @@ const showCountriesGraphs = (data, node, firstFilter) => {
 }
 
 const showTeamsGraphs = (data, node, firstFilter, secondFilter) => {
-  onChangeElement.checked = false;
+  onChangeElement.checked = true;
 
   // onChangeElement.disabled = true;
   // changeGraphLabelElement.style.opacity = 0.4;
@@ -214,7 +214,7 @@ const showTeamsGraphs = (data, node, firstFilter, secondFilter) => {
   // }
 }
 const showFootbollmanGraphs = (data, node, firstFilter, secondFilter, thirdFilter) => {
-  onChangeElement.checked = false;
+  onChangeElement.checked = true;
 
   // onChangeElement.disabled = true;
   // changeGraphLabelElement.style.opacity = 0.4;
@@ -364,10 +364,10 @@ const getCsv = async () => {
   setPointData(data);
 
   onChangeElement.addEventListener('change', (e) => {
-    
+    // console.log({firstFilter,secondFilter, thirdFilter, fourthFilter});
     if (!firstFilter) {
       filterStep1Button.style.display = 'none';
-      if (e.target.checked) {
+      if (!e.target.checked) {
         const nextLeftData = fromRegionInInsideToLegueTop(data);
         const nextRightData = fromLeagueTopOutInsideToRegion(data);
         // createGraphs(nextLeftData, nextRightData, data);
@@ -378,7 +378,7 @@ const getCsv = async () => {
       }
     } else if (fourthFilter) {
       // console.log({fourthFilter});
-      if (e.target.checked) {
+      if (!e.target.checked) {
         const nextLeftData = fromFootballmans(data, fourthFilter, thirdFilter, secondFilter, firstFilter);
         const nextRightData = toFootballmans(data, fourthFilter, thirdFilter, secondFilter, firstFilter);
         
@@ -388,7 +388,7 @@ const getCsv = async () => {
       }
     } else if (thirdFilter) {
       // console.log({thirdFilter});
-      if (e.target.checked) {
+      if (!e.target.checked) {
         const nextLeftData = fromTeams(data, thirdFilter, secondFilter, firstFilter);
         const nextRightData = toTeams(data, thirdFilter, secondFilter, firstFilter);
         showByLeagues(nextLeftData, nextRightData, data);
@@ -397,7 +397,7 @@ const getCsv = async () => {
       }
     } else if (secondFilter) {
       // console.log({secondFilter});
-      if (e.target.checked) {
+      if (!e.target.checked) {
         const nextLeftData = fromLegues(data, secondFilter, firstFilter);
         const nextRightData = toLeagues(data, secondFilter, firstFilter);
         showByLeagues(nextLeftData, nextRightData, data);
@@ -406,7 +406,7 @@ const getCsv = async () => {
       }
     } else if (firstFilter) {
       // console.log({firstFilter});
-      if (e.target.checked) {
+      if (!e.target.checked) {
         const nextLeftData = fromCountries(data, firstFilter);
         const nextRightData = toCountries(data, firstFilter);
         showByLeagues(nextLeftData, nextRightData, data);
@@ -429,6 +429,7 @@ const getCsv = async () => {
     firstFilter = null;
     secondFilter = null;
     thirdFilter = null;
+    fourthFilter = null;
     
     setPointData(data);
   });
@@ -443,6 +444,7 @@ const getCsv = async () => {
 
     secondFilter = null;
     thirdFilter = null;
+    fourthFilter = null;
 
     setPointData(data, firstFilter);
   });
@@ -455,6 +457,7 @@ const getCsv = async () => {
     filterStep4Button.style.display = 'none';
 
     thirdFilter = null;
+    fourthFilter = null;
 
     setPointData(data, firstFilter, secondFilter);
   });

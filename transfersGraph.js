@@ -216,7 +216,7 @@ export const setPointData = (data, firstFilter, secondFilter, thirdFilter, fourt
   clearGraph();
 
   let filtered = [];
-  console.log({firstFilter, secondFilter, thirdFilter, fourthFilter});
+  // console.log({firstFilter, secondFilter, thirdFilter, fourthFilter});
 
   if (firstFilter && secondFilter && thirdFilter && fourthFilter) {
     const filteredByType = data.filter(d => 
