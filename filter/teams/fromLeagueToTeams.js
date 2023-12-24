@@ -60,6 +60,7 @@ export const fromLeagueToTeams = (data, league, firstFilter, secondFilter) => {
       source: teams[key].index,
       target: 0,
       value: teams[key].value,
+      data: {type: 'left'}
     });
   });
   return {nodes, links, transfers};

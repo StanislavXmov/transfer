@@ -530,6 +530,29 @@ const onHoverPath = (path) => {
         );
       }
     // from last filter
+    } else if (thirdFilter) {
+      const filteredByType = pointsData.filter(d => 
+        d[typeField] === type || d[typeField] === insideType);
+      if (isRight) {
+        const leagueKey = leaguesOrder.find(l => l.title === path.source.name);
+        filtered = filteredByType.filter(d => 
+          d[fromRegionField] === region &&
+          d[toRegionField] === firstFilter &&
+          d[fromLeagueField] === leagueKey.key &&
+          d[toCountryField] === secondFilter &&
+          d[toLeagueField] === thirdFilter &&
+          d[toTeamField] === nodeType
+        );
+      } else {
+        filtered = filteredByType.filter(d => 
+          d[fromRegionField] === firstFilter &&
+          d[toRegionField] === region &&
+          d[toLeagueField] === nodeTypeTo &&
+          d[fromCountryField] === secondFilter &&
+          d[fromLeagueField] === thirdFilter &&
+          d[fromTeamField] === nodeType
+        );
+      }
     } else if (secondFilter) {
       const filteredByType = pointsData.filter(d => 
         d[typeField] === type || d[typeField] === insideType);
@@ -587,6 +610,26 @@ const onHoverPath = (path) => {
         );
       }
     // from last filter
+    } else if (thirdFilter) {
+      const filteredByType = pointsData.filter(d => 
+        d[typeField] === type || d[typeField] === insideType);
+      if (isRight) {
+        filtered = filteredByType.filter(d => 
+          d[fromRegionField] === region &&
+          d[toRegionField] === firstFilter &&
+          d[toCountryField] === secondFilter &&
+          d[toLeagueField] === thirdFilter &&
+          d[toTeamField] === nodeType
+        );
+      } else { 
+        filtered = filteredByType.filter(d => 
+          d[fromRegionField] === firstFilter &&
+          d[toRegionField] === region &&
+          d[fromCountryField] === secondFilter &&
+          d[fromLeagueField] === thirdFilter &&
+          d[fromTeamField] === nodeType
+        );
+      }
     } else if (secondFilter) {
       const filteredByType = pointsData.filter(d => 
         d[typeField] === type || d[typeField] === insideType);

@@ -58,6 +58,7 @@ export const fromLeagueToTeamsOut = (data, league, firstFilter, secondFilter) =>
       source: 0,
       target: teams[key].index,
       value: teams[key].value,
+      data: {type: 'right'}
     });
   });
   
