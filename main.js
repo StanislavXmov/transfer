@@ -592,42 +592,83 @@ const createGraph = (id, type, graph, height, data) => {
   .join("g")
   .style("mix-blend-mode", "multiply");
   // test color
-  // const gradient = link.append("linearGradient")
-  //   .attr("id", d => {
-  //     return `${d.index}Link`;
-  //   })
-  //   .attr("gradientUnits", "userSpaceOnUse")
-  //   .attr("x1", d => d.source.x1)
-  //   .attr("x2", d => d.target.x0);
-  // gradient.append("stop")
-  //   .attr("offset", "0%")
-  //   .attr("stop-color", d => color(d.source.name));
-  // gradient.append("stop")
-  //   .attr("offset", "100%")
-  //   .attr("stop-color", d => color(d.target.name));
+  const gradient = link.append("linearGradient")
+    .attr("id", d => {
+      return `${d.index}${type}Link`;
+    })
+    .attr("gradientUnits", "userSpaceOnUse")
+    .attr("x1", d => d.source.x1)
+    .attr("x2", d => d.target.x0);
+  gradient.append("stop")
+    .attr("offset", "0%")
+    .attr("stop-color", d => {
+      if (type === left) {
+        if (!firstFilter) {
+          if (d.source.name === region) {
+            return '#00000020';
+          }
+          if (colors[d.source.name]) {
+            return colors[d.source.name];
+          }
+          return '#00000020';
+        } else if (firstFilter) {
+          if (firstFilter === region) {
+            return '#00000020';
+          }
+          return colors[firstFilter];
+        }
+      } else {
+        return '#00000020';
+      }
+      return "#000000";
+    });
+  gradient.append("stop")
+    .attr("offset", "100%")
+    .attr("stop-color", d => {
+      if (type === left) {
+        return '#00000020';
+      } else {
+        if (!firstFilter) {
+          if (d.target.name === region) {
+            return '#00000020';
+          }
+          if (colors[d.target.name]) {
+            return colors[d.target.name];
+          }
+          return '#00000020';
+        } else if (firstFilter) {
+          console.log(firstFilter);
+          if (firstFilter === region) {
+            return '#00000020';
+          }
+          return colors[firstFilter];
+        }
+      }
+      return '#00000020'
+    });
 
   link.append("path")
     .attr("d", sankeyLinkHorizontal())
     .attr("stroke-width", d => Math.max(1, d.width))
     // test color
-    // .attr("stroke", d => `url(#${d.index}Link)`)
-    .attr("stroke", d => {
-      if (!firstFilter) {
-        if (d.source.name === region) {
-          return '#00000020';
-        }
-        if (colors[d.source.name]) {
-          return colors[d.source.name];
-        }
-        return '#00000020';
-      } else if (firstFilter) {
-        if (firstFilter === region) {
-          return '#00000020';
-        }
-        return colors[firstFilter];
-      }
-      return "#000000";
-    })
+    .attr("stroke", d => `url(#${d.index}${type}Link)`)
+    // .attr("stroke", d => {
+    //   if (!firstFilter) {
+    //     if (d.source.name === region) {
+    //       return '#00000020';
+    //     }
+    //     if (colors[d.source.name]) {
+    //       return colors[d.source.name];
+    //     }
+    //     return '#00000020';
+    //   } else if (firstFilter) {
+    //     if (firstFilter === region) {
+    //       return '#00000020';
+    //     }
+    //     return colors[firstFilter];
+    //   }
+    //   return "#000000";
+    // })
     .style("cursor", "pointer")
     .on('mouseover', (e, d) => {
       onHoverPath(d);
