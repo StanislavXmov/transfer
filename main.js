@@ -19,7 +19,7 @@ import { fromCountries } from './filter/checked/fromCountries';
 import { toCountries } from './filter/checked/toCountries';
 import { fromLegues } from './filter/checked/fromLegues';
 import { toLeagues } from './filter/checked/toLeagues';
-import { fromCountryField, fromLeagueField, fromRegionField, fromTeamField, inType, insideType, outType, region, toCountryField, toLeagueField, toRegionField, toTeamField, typeField } from './fields';
+import { fromCountryField, fromLeagueField, fromRegionField, fromTeamField, inType, insideType, outType, playerField, region, toCountryField, toLeagueField, toRegionField, toTeamField, typeField } from './fields';
 import { fromLeagueToTeams } from './filter/teams/fromLeagueToTeams';
 import { fromLeagueToTeamsOut } from './filter/teams/fromLeagueToTeamsOut';
 import { fromTeams } from './filter/checked/fromTeams';
@@ -364,8 +364,6 @@ const getCsv = async () => {
   signingElement.textContent = leftData.transfers;
   outingElement.textContent = rightData.transfers;
 
-  console.log({leftData, rightData});
-
   renderGraph(leftData, rightData, data);
 
   setPointData(data);
@@ -497,10 +495,10 @@ const onHoverPath = (path) => {
   if (isRight) {
     nodeType = path.target.name;
   }
-  console.log({type: path.data.type, firstFilter, secondFilter, thirdFilter, fourthFilter});
+  // console.log({type: path.data.type, firstFilter, secondFilter, thirdFilter, fourthFilter});
 
   const pointsData = getPointsData();
-  console.log('pointsData', pointsData);
+  // console.log('pointsData', pointsData);
 
   let type = inType;
   if (isRight) {
@@ -530,6 +528,31 @@ const onHoverPath = (path) => {
         );
       }
     // from last filter
+    } else if (fourthFilter) {
+      const filteredByType = pointsData.filter(d => 
+        d[typeField] === type || d[typeField] === insideType);
+      if (isRight) {
+        const leagueKey = leaguesOrder.find(l => l.title === path.source.name);
+        filtered = filteredByType.filter(d => 
+          d[fromRegionField] === region &&
+          d[toRegionField] === firstFilter &&
+          d[fromLeagueField] === leagueKey.key &&
+          d[toCountryField] === secondFilter &&
+          d[toLeagueField] === thirdFilter &&
+          d[toTeamField] === fourthFilter &&
+          d[playerField] === nodeType
+        );
+      } else {
+        filtered = filteredByType.filter(d => 
+          d[fromRegionField] === firstFilter &&
+          d[toRegionField] === region &&
+          d[toLeagueField] === nodeTypeTo &&
+          d[fromCountryField] === secondFilter &&
+          d[fromLeagueField] === thirdFilter &&
+          d[fromTeamField] === fourthFilter &&
+          d[playerField] === nodeType
+        );
+      }
     } else if (thirdFilter) {
       const filteredByType = pointsData.filter(d => 
         d[typeField] === type || d[typeField] === insideType);
@@ -610,6 +633,28 @@ const onHoverPath = (path) => {
         );
       }
     // from last filter
+    } else if (fourthFilter) {
+      const filteredByType = pointsData.filter(d => 
+        d[typeField] === type || d[typeField] === insideType);
+      if (isRight) {
+        filtered = filteredByType.filter(d => 
+          d[fromRegionField] === region &&
+          d[toRegionField] === firstFilter &&
+          d[toCountryField] === secondFilter &&
+          d[toLeagueField] === thirdFilter &&
+          d[toTeamField] === fourthFilter &&
+          d[playerField] === nodeType
+        );
+      } else { 
+        filtered = filteredByType.filter(d => 
+          d[fromRegionField] === firstFilter &&
+          d[toRegionField] === region &&
+          d[fromCountryField] === secondFilter &&
+          d[fromLeagueField] === thirdFilter &&
+          d[fromTeamField] === fourthFilter &&
+          d[playerField] === nodeType
+        );
+      }
     } else if (thirdFilter) {
       const filteredByType = pointsData.filter(d => 
         d[typeField] === type || d[typeField] === insideType);
@@ -667,7 +712,7 @@ const onHoverPath = (path) => {
     }
   }
 
-  console.log('filtered', filtered);
+  // console.log('filtered', filtered);
   filtered.forEach((d) => {
     d3.selectAll(`[data-index="${d.i}"]`)
     .style("opacity", 1)

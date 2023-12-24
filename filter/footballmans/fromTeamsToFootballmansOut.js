@@ -59,6 +59,7 @@ export const fromTeamsToFootballmansOut = (data, team, firstFilter, secondFilter
       source: 0,
       target: players[key].index,
       value: players[key].value,
+      data: {type: 'right'}
     });
   });
   

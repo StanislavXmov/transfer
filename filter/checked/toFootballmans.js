@@ -80,6 +80,7 @@ export const toFootballmans = (data, team, thirdFilter, secondFilter, firstFilte
             source: index,
             target: node.node,
             value: regions[key].value,
+            data: {type: 'right'}
           });
         }
       });
