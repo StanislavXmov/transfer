@@ -60,6 +60,7 @@ export const fromLeagueToCountry = (data, country, firstFilter) => {
       source: 0,
       target: leagues[key].index,
       value: leagues[key].value,
+      data: {type: 'right'}
     });
   });
 

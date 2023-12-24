@@ -78,6 +78,7 @@ export const fromLegues = (data, country, firstFilter) => {
             source: index,
             target: node.node,
             value: leagues[key.key].value,
+            data: {type: 'left', originName: key.key}
           });
         }
       });

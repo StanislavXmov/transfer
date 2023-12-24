@@ -75,6 +75,7 @@ export const toLeagues = (data, country, firstFilter) => {
             source: index,
             target: node.node,
             value: regions[key].value,
+            data: {type: 'right'}
           });
         }
       });
