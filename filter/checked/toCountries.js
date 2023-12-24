@@ -65,6 +65,7 @@ export const toCountries = (data, regionType) => {
             source: index,
             target: node.node,
             value: regions[key].value,
+            data: {type: 'right'}
           });
         }
       });

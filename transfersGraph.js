@@ -318,6 +318,7 @@ export const setPointData = (data, firstFilter, secondFilter, thirdFilter, fourt
     );
     // console.log(filtered.length);
     dataState = filtered;
+    dataState = dataState.map((d, i) => ({...d, i}));
     createPoints(filtered);
   } else {
     

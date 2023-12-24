@@ -69,6 +69,7 @@ export const fromCountries = (data, regionType) => {
             source: index,
             target: node.node,
             value: leagues[key.key].value,
+            data: {type: 'left', originName: key.key}
           });
         }
       });

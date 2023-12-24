@@ -74,6 +74,7 @@ export const filterByTopToCountry = (data, selectedRegion) => {
         source: 0,
         target: countries[key].index,
         value: countries[key].value,
+        data: {type: 'right'}
       });
     }
   });

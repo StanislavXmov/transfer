@@ -19,7 +19,7 @@ import { fromCountries } from './filter/checked/fromCountries';
 import { toCountries } from './filter/checked/toCountries';
 import { fromLegues } from './filter/checked/fromLegues';
 import { toLeagues } from './filter/checked/toLeagues';
-import { fromLeagueField, fromRegionField, fromTeamField, inType, insideType, outType, region, toLeagueField, toRegionField, toTeamField, typeField } from './fields';
+import { fromCountryField, fromLeagueField, fromRegionField, fromTeamField, inType, insideType, outType, region, toCountryField, toLeagueField, toRegionField, toTeamField, typeField } from './fields';
 import { fromLeagueToTeams } from './filter/teams/fromLeagueToTeams';
 import { fromLeagueToTeamsOut } from './filter/teams/fromLeagueToTeamsOut';
 import { fromTeams } from './filter/checked/fromTeams';
@@ -416,7 +416,6 @@ const getCsv = async () => {
       if (!e.target.checked) {
         const nextLeftData = fromCountries(data, firstFilter);
         const nextRightData = toCountries(data, firstFilter);
-        console.log({nextLeftData, nextRightData});
         showByLeagues(nextLeftData, nextRightData, data);
       } else {
         showRegionsGraphs(data, {name: firstFilter});
@@ -501,7 +500,7 @@ const onHoverPath = (path) => {
   console.log({type: path.data.type, firstFilter, secondFilter, thirdFilter, fourthFilter});
 
   const pointsData = getPointsData();
-  // console.log(pointsData);
+  console.log('pointsData', pointsData);
 
   let type = inType;
   if (isRight) {
@@ -510,6 +509,7 @@ const onHoverPath = (path) => {
 
   let filtered = [];
 
+  // checked
   if (!onChangeElement.checked) {
     const nodeTypeTo = path.data.originName;
     if (!firstFilter) {
@@ -530,6 +530,26 @@ const onHoverPath = (path) => {
           d[toLeagueField] === nodeTypeTo
         );
       }
+    // from last filter
+    } else if (firstFilter) {
+      const filteredByType = pointsData.filter(d => 
+        d[typeField] === type || d[typeField] === insideType);
+      if (isRight) {
+        const leagueKey = leaguesOrder.find(l => l.title === path.source.name)
+        filtered = filteredByType.filter(d => 
+          d[fromRegionField] === region &&
+          d[toRegionField] === firstFilter &&
+          d[fromLeagueField] === leagueKey.key &&
+          d[toCountryField] === nodeType
+        );
+      } else {
+        filtered = filteredByType.filter(d => 
+          d[fromRegionField] === firstFilter &&
+          d[toRegionField] === region &&
+          d[toLeagueField] === nodeTypeTo &&
+          d[fromCountryField] === nodeType
+        );
+      }
     }
   } else {
     if (!firstFilter) {
@@ -546,10 +566,29 @@ const onHoverPath = (path) => {
           d[toRegionField] === region
         );
       }
+    // from last filter
+    } else if (firstFilter) {
+      const filteredByType = pointsData.filter(d => 
+        d[typeField] === type || d[typeField] === insideType);
+      if (isRight) {
+        console.log(right, nodeType, firstFilter);
+        filtered = filteredByType.filter(d => 
+          d[fromRegionField] === region &&
+          d[toRegionField] === firstFilter &&
+          d[toCountryField] === nodeType
+        );
+      } else { 
+        console.log(left, nodeType, firstFilter);
+        filtered = filteredByType.filter(d => 
+          d[fromRegionField] === firstFilter &&
+          d[toRegionField] === region &&
+          d[fromCountryField] === nodeType
+        );
+      }
     }
   }
 
-  console.log(filtered);
+  console.log('filtered', filtered);
   filtered.forEach((d) => {
     d3.selectAll(`[data-index="${d.i}"]`)
     .style("opacity", 1)
