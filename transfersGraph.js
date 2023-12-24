@@ -122,6 +122,8 @@ const getToColor = (d) => {
 let dataState = [];
 let selected = '-1';
 
+export const getPointsData = () => dataState;
+
 const circleOver = (e) => {
   if (e.target.dataset.index && selected !== e.target.dataset.index) {
     selected = e.target.dataset.index;
@@ -326,6 +328,7 @@ export const setPointData = (data, firstFilter, secondFilter, thirdFilter, fourt
 
     // console.log(filtered.length);
     dataState = filtered;
+    dataState = dataState.map((d, i) => ({...d, i}));
     createPoints(filtered);
   }
 }

@@ -40,6 +40,7 @@ export const toTopInInside = (data) => {
         source: regions[key].index,
         target: 0,
         value: regions[key].value,
+        data: {type: 'left'}
       });
     }
   });

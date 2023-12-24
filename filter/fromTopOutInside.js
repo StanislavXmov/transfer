@@ -41,6 +41,7 @@ export const fromTopOutInside = (data) => {
         source: 0,
         target: regions[key].index,
         value: regions[key].value,
+        data: {type: 'right'}
       });
     }
   });

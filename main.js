@@ -2,7 +2,7 @@ import * as d3 from 'd3';
 import { sankey, sankeyLinkHorizontal } from 'd3-sankey';
 import './style.css';
 
-import { setPointData } from './transfersGraph';
+import { getPointsData, setPointData } from './transfersGraph';
 
 import { filterByCountryToTop } from './filterByCountryToTop';
 import { filterByTopToCountry } from './filterByTopToCountry';
@@ -19,7 +19,7 @@ import { fromCountries } from './filter/checked/fromCountries';
 import { toCountries } from './filter/checked/toCountries';
 import { fromLegues } from './filter/checked/fromLegues';
 import { toLeagues } from './filter/checked/toLeagues';
-import { fromLeagueField, fromTeamField, region, toLeagueField, toTeamField } from './fields';
+import { fromLeagueField, fromRegionField, fromTeamField, inType, insideType, outType, region, toLeagueField, toRegionField, toTeamField, typeField } from './fields';
 import { fromLeagueToTeams } from './filter/teams/fromLeagueToTeams';
 import { fromLeagueToTeamsOut } from './filter/teams/fromLeagueToTeamsOut';
 import { fromTeams } from './filter/checked/fromTeams';
@@ -364,6 +364,8 @@ const getCsv = async () => {
   signingElement.textContent = leftData.transfers;
   outingElement.textContent = rightData.transfers;
 
+  console.log({leftData, rightData});
+
   renderGraph(leftData, rightData, data);
 
   setPointData(data);
@@ -482,6 +484,65 @@ const getCsv = async () => {
 
 getCsv();
 
+const setPointsOpacity = (v) => {
+  d3.selectAll(`[data-index]`)
+  .style("opacity", v);
+}
+
+const onHoverPath = (path) => {
+  if (!onChangeElement.checked) {
+    return;
+  }
+  // points
+  setPointsOpacity(0.2);
+  console.log(path, path.source.name, path.target.name);
+  let nodeType = path.source.name;
+  const isRight = path.data.type === right;
+  if (isRight) {
+    nodeType = path.target.name;
+  }
+  console.log({type: path.data.type, firstFilter, secondFilter, thirdFilter, fourthFilter});
+
+  const pointsData = getPointsData();
+  // console.log(pointsData);
+
+  let type = inType;
+  if (isRight) {
+    type = outType;
+  }
+
+  let filtered = [];
+
+  if (!firstFilter) {
+    const filteredByType = pointsData.filter(d => 
+      d[typeField] === type || d[typeField] === insideType);
+    if (isRight) {
+      filtered = filteredByType.filter(d => 
+        d[fromRegionField] === region &&
+        d[toRegionField] === nodeType
+      );
+    } else {
+      filtered = filteredByType.filter(d => 
+        d[fromRegionField] === nodeType &&
+        d[toRegionField] === region
+      );
+    }
+    
+  }
+
+  // d3.selectAll(`[data-index="39"]`)
+  //   .style("opacity", 1)
+  //   .style("z-index", 100);
+
+  // console.log(filtered);
+  filtered.forEach((d) => {
+    d3.selectAll(`[data-index="${d.i}"]`)
+    .style("opacity", 1)
+    // .style("z-index", 100);
+  });
+  
+}
+
 const clearGraph = (id, type) => {
   const el = document.querySelector(id);
   el.innerHTML = '';
@@ -554,6 +615,8 @@ const createGraph = (id, type, graph, height, data) => {
     })
     .style("cursor", "pointer")
     .on('mouseover', (e, d) => {
+      onHoverPath(d);
+
       d3.select(e.target).style("opacity", 0.8);
       if (d.width > 50) {
         return;
@@ -568,6 +631,9 @@ const createGraph = (id, type, graph, height, data) => {
         .style("opacity", 1);
     })
     .on('mouseout', (e, d) => {
+      // points
+      setPointsOpacity(1);
+
       d3.select(e.target).style("opacity", 1);
       if (d.width > 50) {
         return;
