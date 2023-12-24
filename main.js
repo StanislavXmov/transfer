@@ -7,7 +7,7 @@ import { getPointsData, setPointData } from './transfersGraph';
 import { filterByCountryToTop } from './filterByCountryToTop';
 import { filterByTopToCountry } from './filterByTopToCountry';
 
-import { countries, europeLeft, europeRight, regionsOrder, top } from './order';
+import { countries, europeLeft, europeRight, leaguesOrder, regionsOrder, top } from './order';
 import { toTopInInside } from './filter/toTopInInside';
 import { fromTopOutInside } from './filter/fromTopOutInside';
 import { fromRegionInInsideToLegueTop } from './filter/fromRegionInInsideToLegueTop';
@@ -490,9 +490,6 @@ const setPointsOpacity = (v) => {
 }
 
 const onHoverPath = (path) => {
-  if (!onChangeElement.checked) {
-    return;
-  }
   // points
   setPointsOpacity(0.2);
   console.log(path, path.source.name, path.target.name);
@@ -513,28 +510,46 @@ const onHoverPath = (path) => {
 
   let filtered = [];
 
-  if (!firstFilter) {
-    const filteredByType = pointsData.filter(d => 
-      d[typeField] === type || d[typeField] === insideType);
-    if (isRight) {
-      filtered = filteredByType.filter(d => 
-        d[fromRegionField] === region &&
-        d[toRegionField] === nodeType
-      );
-    } else {
-      filtered = filteredByType.filter(d => 
-        d[fromRegionField] === nodeType &&
-        d[toRegionField] === region
-      );
+  if (!onChangeElement.checked) {
+    const nodeTypeTo = path.data.originName;
+    if (!firstFilter) {
+      console.log(nodeType, nodeTypeTo);
+      const filteredByType = pointsData.filter(d => 
+        d[typeField] === type || d[typeField] === insideType);
+      if (isRight) {
+        const leagueKey = leaguesOrder.find(l => l.title === path.source.name)
+        filtered = filteredByType.filter(d => 
+          d[fromRegionField] === region &&
+          d[toRegionField] === nodeType &&
+          d[fromLeagueField] === leagueKey.key
+        );
+      } else {
+        filtered = filteredByType.filter(d => 
+          d[fromRegionField] === nodeType &&
+          d[toRegionField] === region &&
+          d[toLeagueField] === nodeTypeTo
+        );
+      }
     }
-    
+  } else {
+    if (!firstFilter) {
+      const filteredByType = pointsData.filter(d => 
+        d[typeField] === type || d[typeField] === insideType);
+      if (isRight) {
+        filtered = filteredByType.filter(d => 
+          d[fromRegionField] === region &&
+          d[toRegionField] === nodeType
+        );
+      } else {
+        filtered = filteredByType.filter(d => 
+          d[fromRegionField] === nodeType &&
+          d[toRegionField] === region
+        );
+      }
+    }
   }
 
-  // d3.selectAll(`[data-index="39"]`)
-  //   .style("opacity", 1)
-  //   .style("z-index", 100);
-
-  // console.log(filtered);
+  console.log(filtered);
   filtered.forEach((d) => {
     d3.selectAll(`[data-index="${d.i}"]`)
     .style("opacity", 1)

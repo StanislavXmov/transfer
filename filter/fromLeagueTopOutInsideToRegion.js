@@ -57,6 +57,7 @@ export const fromLeagueTopOutInsideToRegion = (data) => {
             source: index,
             target: node.node,
             value: regions[key].value,
+            data: {type: 'right'}
           });
         }
       });
