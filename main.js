@@ -62,6 +62,8 @@ const left = 'left';
 const graphRightId = '#graphRight';
 const right = 'right';
 
+const white = '#eeeeee'
+
 const createGraphsWithMoreNodes = (leftData, rightData, newHeight, data) => {
   clearGraph(graphRightId, right);
   clearGraph(graphLeftId, left);
@@ -748,12 +750,12 @@ const createGraph = (id, type, graph, height, data) => {
   
   const link = group.append("g")
   .attr("fill", "none")
-  .attr("stroke-opacity", 0.2)
+  // .attr("stroke-opacity", 0.2)
   .attr("stroke", "#000")
   .selectAll()
   .data(links)
   .join("g")
-  .style("mix-blend-mode", "multiply");
+  // .style("mix-blend-mode", "multiply");
   // test color
   const gradient = link.append("linearGradient")
     .attr("id", d => {
@@ -768,20 +770,20 @@ const createGraph = (id, type, graph, height, data) => {
       if (type === left) {
         if (!firstFilter) {
           if (d.source.name === region) {
-            return '#00000020';
+            return white;
           }
           if (colors[d.source.name]) {
             return colors[d.source.name];
           }
-          return '#00000020';
+          return white;
         } else if (firstFilter) {
           if (firstFilter === region) {
-            return '#00000020';
+            return white;
           }
           return colors[firstFilter];
         }
       } else {
-        return '#00000020';
+        return white;
       }
       return "#000000";
     });
@@ -789,25 +791,24 @@ const createGraph = (id, type, graph, height, data) => {
     .attr("offset", "100%")
     .attr("stop-color", d => {
       if (type === left) {
-        return '#00000020';
+        return white;
       } else {
         if (!firstFilter) {
           if (d.target.name === region) {
-            return '#00000020';
+            return white;
           }
           if (colors[d.target.name]) {
             return colors[d.target.name];
           }
-          return '#00000020';
+          return white;
         } else if (firstFilter) {
-          console.log(firstFilter);
           if (firstFilter === region) {
-            return '#00000020';
+            return white;
           }
           return colors[firstFilter];
         }
       }
-      return '#00000020'
+      return white
     });
 
   link.append("path")

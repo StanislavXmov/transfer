@@ -65,8 +65,8 @@ axisData.forEach((step, i) => {
 
 const svg = d3.select('#transferContainer').append("svg")
   .attr("width", width)
-  .attr("height", height + 10)
-  .attr("viewBox", [0, 0, width, height])
+  .attr("height", 900 + 10)
+  .attr("viewBox", [0, 0, width, 900])
   // .attr("style", "max-width: 100%; height: auto;");
 
 Object.keys(axis.x).forEach(key => {
@@ -95,6 +95,52 @@ const getX = (d) => {
     const v = Number(d[marketValueField].split(',').join(''));
     if (v >= x) {
       return axis.x[x];
+    }
+  }
+}
+
+let yState = {};
+let yStatePL = {};
+let yStatePR = {};
+let yStatePC = {};
+console.log(yState);
+
+const setYState = (d) => {
+  if (d[feeField] === '0' || d[feeField] === '?') {
+    if (yState[Number(d[marketValueField].split(',').join(''))]) {
+      yState[Number(d[marketValueField].split(',').join(''))] += 1; 
+    } else {
+      yState[Number(d[marketValueField].split(',').join(''))] = 1;
+    }
+  }
+}
+
+const setYStatePL = (d) => {
+  if (d[feeField] === '0' || d[feeField] === '?') {
+    if (yStatePL[Number(d[marketValueField].split(',').join(''))]) {
+      yStatePL[Number(d[marketValueField].split(',').join(''))] += 1; 
+    } else {
+      yStatePL[Number(d[marketValueField].split(',').join(''))] = 1;
+    }
+  }
+}
+
+const setYStatePR = (d) => {
+  if (d[feeField] === '0' || d[feeField] === '?') {
+    if (yStatePR[Number(d[marketValueField].split(',').join(''))]) {
+      yStatePR[Number(d[marketValueField].split(',').join(''))] += 1; 
+    } else {
+      yStatePR[Number(d[marketValueField].split(',').join(''))] = 1;
+    }
+  }
+}
+
+const setYStatePC = (d) => {
+  if (d[feeField] === '0' || d[feeField] === '?') {
+    if (yStatePC[Number(d[marketValueField].split(',').join(''))]) {
+      yStatePC[Number(d[marketValueField].split(',').join(''))] += 1; 
+    } else {
+      yStatePC[Number(d[marketValueField].split(',').join(''))] = 1;
     }
   }
 }
@@ -167,6 +213,11 @@ const d1 = "M0 3C0 4.65685 1.34315 6 3 6V0C1.34315 0 0 1.34315 0 3Z";
 const d2 = "M3 6C4.65685 6 6 4.65685 6 3C6 1.34315 4.65685 0 3 0V6Z";
 
 const createPoints = (data) => {
+  yState = {};
+  yStatePL = {};
+  yStatePR = {};
+  yStatePC = {};
+  
   svg.append("g")
     .attr("id", "group1")
     .selectAll()
@@ -175,14 +226,31 @@ const createPoints = (data) => {
       .on('mouseover', circleOver)
       .on('mouseout', circleOut)
       .style("cursor", "pointer")
-      .attr("data-index", (d, i) => i)
-      .attr("data-left", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + paddingLeft - 3)
-      .attr("data-top", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy)
-      .attr("transform", d => `
+      // .attr("data-index", (d, i) => i)
+      // .attr("data-left", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + paddingLeft - 3)
+      // .attr("data-top", d => {
+      //   if (d[feeField] === '0' || d[feeField] === '?') {
+      //     const n = yState[Number(d[marketValueField].split(',').join(''))];
+      //     return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy + 20 + n * 3
+      //   }
+        
+      //   return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy;
+      // })
+      .attr("transform", d => {
+        if (d[feeField] === '0' || d[feeField] === '?') {
+          setYState(d);
+          const n = yState[Number(d[marketValueField].split(',').join(''))];
+          return `
+            translate(
+              ${getX(d)(Number(d[marketValueField].split(',').join(''))) + paddingLeft - 3}, 
+              ${getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy + 20 + n * 3})
+            `;
+        }
+        return `
         translate(
           ${getX(d)(Number(d[marketValueField].split(',').join(''))) + paddingLeft - 3}, 
           ${getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy})
-        `)
+        `})
       .append("circle")
       .attr("cx", 3)
       .attr("cy", 3)
@@ -191,21 +259,48 @@ const createPoints = (data) => {
       .attr("fill", "none")
       .attr("data-index", (d, i) => i)
       .attr("data-left", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + paddingLeft - 3)
-      .attr("data-top", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy)
+      // .attr("data-top", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy)
+      .attr("data-top", d => {
+        if (d[feeField] === '0' || d[feeField] === '?') {
+          setYStatePL(d);
+          const n = yStatePL[Number(d[marketValueField].split(',').join(''))];
+          return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy + 20 + n * 3
+        }
+        
+        return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy;
+      })
       .select(function() { return this.parentNode; })
       .append("path")
         .attr("d", d1)
         .attr("fill", d => getFromColor(d))
         .attr("data-index", (d, i) => i)
         .attr("data-left", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + paddingLeft - 3)
-        .attr("data-top", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy)
+        // .attr("data-top", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy)
+        .attr("data-top", d => {
+          if (d[feeField] === '0' || d[feeField] === '?') {
+            setYStatePR(d);
+            const n = yStatePR[Number(d[marketValueField].split(',').join(''))];
+            return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy + 20 + n * 3
+          }
+          
+          return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy;
+        })
         .select(function() { return this.parentNode; })
         .append("path")
         .attr("d", d2)
         .attr("fill", d => getToColor(d))
         .attr("data-index", (d, i) => i)
         .attr("data-left", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + paddingLeft - 3)
-        .attr("data-top", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy);
+        // .attr("data-top", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy);
+        .attr("data-top", d => {
+          if (d[feeField] === '0' || d[feeField] === '?') {
+            setYStatePC(d);
+            const n = yStatePC[Number(d[marketValueField].split(',').join(''))];
+            return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy + 20 + n * 3
+          }
+          
+          return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy;
+        });
 }
 
 const clearGraph = () => {
