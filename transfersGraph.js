@@ -27,9 +27,11 @@ const marketValue = document.getElementById('marketValue');
 const fee = document.getElementById('fee');
 
 const axisData = [0, 10_000, 100_000, 1_000_000, 10_000_000, 100_000_000, 1_000_000_000];
+const axisDataY = [50_000, 100_000, 1_000_000, 10_000_000, 100_000_000, 1_000_000_000];
 const axisDataString = {
   "0": "0",
   "10000": "10k",
+  "50000": "50k",
   "100000": "100k",
   "1000000": "1M",
   "10000000": "10M",
@@ -57,9 +59,15 @@ axisData.forEach((step, i) => {
   axis.x[step] = d3.scaleLinear()
     .domain([step, axisData[i + 1]])
     .range([i * axisStep, (i + 1) * axisStep]);
+});
+
+axisDataY.forEach((step, i) => {
+  if (!axisDataY[i + 1]) {
+    return;
+  }
 
   axis.y[step] = d3.scaleLinear()
-    .domain([step, axisData[i + 1]])
+    .domain([step, axisDataY[i + 1]])
     .range([height - (i * axisStep),height - (i + 1) * axisStep]);
 });
 
@@ -75,19 +83,27 @@ Object.keys(axis.x).forEach(key => {
   }
   svg.append("g")
     .attr("transform", `translate(${paddingLeft},${height - axisStep / 4 - dy })`)
+    .attr("class", `domainX`)
     .call(d3.axisBottom(axis.x[key]).ticks(1).tickFormat((d => `${axisDataString[d]}`)))
     .call(g => g.select(".domain").remove());
 });
+
+svg.selectAll('.domainX')
+  .selectAll("line").remove();
 
 Object.keys(axis.y).forEach(key => {
   if (Number(key) === axisData[axisData.length - 2]) {
     return;
   }
   svg.append("g")
-    .attr("transform", `translate(${paddingLeft}, ${- axisStep / 4  - dy })`)
+    .attr("transform", `translate(${paddingLeft}, ${- axisStep / 4  - dy - 20 })`)
     .call(d3.axisLeft(axis.y[key]).ticks(1).tickFormat((d => `${axisDataString[d]}`)))
     .call(g => g.select(".domain").remove());
 });
+
+axis.y[0] = d3.scaleLinear()
+.domain([0, 50000])
+.range([height - (0 * axisStep),height - (0 + 1) * axisStep]);
 
 const getX = (d) => {
   for (let j = axisData.length - 1; j >= 0; j--) {
@@ -103,7 +119,6 @@ let yState = {};
 let yStatePL = {};
 let yStatePR = {};
 let yStatePC = {};
-console.log(yState);
 
 const setYState = (d) => {
   if (d[feeField] === '0' || d[feeField] === '?') {
@@ -146,8 +161,11 @@ const setYStatePC = (d) => {
 }
 
 const getY = (d) => {
-  for (let j = axisData.length - 1; j >= 0; j--) {
-    let y = axisData[j - 1];
+  if (d[feeField] == 0) {
+    return axis.y['0'];
+  }
+  for (let j = axisDataY.length - 1; j >= 0; j--) {
+    let y = axisDataY[j - 1];
     if (d[feeField] === '?') {
       return axis.y['0'];
     }
@@ -243,13 +261,13 @@ const createPoints = (data) => {
           return `
             translate(
               ${getX(d)(Number(d[marketValueField].split(',').join(''))) + paddingLeft - 3}, 
-              ${getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy + 20 + n * 3})
+              ${getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy + 20 + n * 3 + 10})
             `;
         }
         return `
         translate(
           ${getX(d)(Number(d[marketValueField].split(',').join(''))) + paddingLeft - 3}, 
-          ${getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy})
+          ${getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy - 20})
         `})
       .append("circle")
       .attr("cx", 3)
@@ -267,7 +285,7 @@ const createPoints = (data) => {
           return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy + 20 + n * 3
         }
         
-        return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy;
+        return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy - 20;
       })
       .select(function() { return this.parentNode; })
       .append("path")
@@ -283,7 +301,7 @@ const createPoints = (data) => {
             return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy + 20 + n * 3
           }
           
-          return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy;
+          return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy - 20;
         })
         .select(function() { return this.parentNode; })
         .append("path")
@@ -299,7 +317,7 @@ const createPoints = (data) => {
             return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy + 20 + n * 3
           }
           
-          return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy;
+          return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy - 20;
         });
 }
 
