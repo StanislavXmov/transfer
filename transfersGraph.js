@@ -12,6 +12,9 @@ export const colors = {
   'Retired': '#C1C1C1',
 };
 const container = document.getElementById('transferContainer');
+const axisYTop = document.getElementById('axisYTop');
+const axisYBottom = document.getElementById('axisYBottom');
+const axisX = document.getElementById('axisX');
 const clientWidth = container.clientWidth;
 const transferInfo = document.getElementById('transferInfo');
 // const info = document.getElementById('info');
@@ -46,6 +49,9 @@ const dy = axisStep * 1.65;
 
 const width = (axisData.length - 1) * axisStep + axisStep;
 const height = (axisData.length - 1) * axisStep + axisStep;
+
+axisYTop.style.top = `${axisStep * 2.5}px`;
+axisX.style.top = `${axisStep * 5 + 6}px`;
 
 const axis = {
   x: {},
@@ -319,6 +325,9 @@ const createPoints = (data) => {
           
           return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy - 20;
         });
+
+    const maxh = Math.max(...Object.values(yState)) * 3;
+    axisYBottom.style.top = `${axisStep * 5 + maxh}px`;
 }
 
 const clearGraph = () => {
