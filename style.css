@@ -190,3 +190,42 @@ body {
 svg g text {
   font-size: 9px;
 }
+
+.tableWrapper {
+  margin: 0px;
+  margin-bottom: 200px;
+
+  border: 1px solid #c1c0c0;
+}
+
+.tableHeader {
+  padding: 8px 2px;
+  display: flex;
+}
+
+.tableHeaderColumn {
+  line-height: 12px;
+  font-size: 12px;
+}
+
+.width10 { width: 10%; }
+.width8 { width: 8%; }
+.width7 { width: 7%; }
+.width5 { width: 5%; }
+.width4 { width: 4%; }
+.width3 { width: 3%; }
+
+.tableContent {
+  margin: 0;
+}
+
+.tableRows {
+  display: flex;
+}
+
+.tableCell  {
+  padding: 4px 0;
+  display: block;
+  line-height: 12px;
+  font-size: 12px;
+}

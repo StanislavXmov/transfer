@@ -29,8 +29,10 @@ import { fromTeamsToFootballmansOut } from './filter/footballmans/fromTeamsToFoo
 import { fromFootballmans } from './filter/checked/fromFootballmans';
 import { toFootballmans } from './filter/checked/toFootballmans';
 import { colors } from './transfersGraph';
+import { createRow } from './tableUtils';
 
 const container = document.getElementById('container');
+const tableContent = document.getElementById('tableContent');
 const titleWidth = 100;
 const clientWidth = (container.clientWidth - (titleWidth * 2) - 0) / 2;
 
@@ -369,6 +371,8 @@ const getCsv = async () => {
   renderGraph(leftData, rightData, data);
 
   setPointData(data);
+
+  renderTable(data);
 
   onChangeElement.addEventListener('change', (e) => {
     // console.log({firstFilter,secondFilter, thirdFilter, fourthFilter});
@@ -1023,4 +1027,12 @@ const createGraph = (id, type, graph, height, data) => {
 // createGraph('#graphLeft', 'left', graph1);
 // createGraph('#graphRight', 'right', graph2);
 
+const renderTable = (data) => {
+
+  for (let i = 0; i < 10; i++) {
+    const transfer = data[i];
+    const row = createRow(transfer);
+    tableContent.append(row);
+  }
+}
 
