@@ -32,7 +32,10 @@ import { colors } from './transfersGraph';
 import { createRow } from './tableUtils';
 
 const container = document.getElementById('container');
+// table
 const tableContent = document.getElementById('tableContent');
+const buttonLoadMore = document.getElementById('loadMore');
+
 const titleWidth = 100;
 const clientWidth = (container.clientWidth - (titleWidth * 2) - 0) / 2;
 
@@ -64,7 +67,11 @@ const left = 'left';
 const graphRightId = '#graphRight';
 const right = 'right';
 
-const white = '#eeeeee'
+const white = '#eeeeee';
+
+// table
+let page = 1;
+let limit = 100;
 
 const createGraphsWithMoreNodes = (leftData, rightData, newHeight, data) => {
   clearGraph(graphRightId, right);
@@ -372,7 +379,11 @@ const getCsv = async () => {
 
   setPointData(data);
 
-  renderTable(data);
+  renderTable(data, firstFilter, secondFilter, thirdFilter, fourthFilter);
+  buttonLoadMore.addEventListener('click', () => {
+    page++;
+    renderTable(data, firstFilter, secondFilter, thirdFilter, fourthFilter);
+  });
 
   onChangeElement.addEventListener('change', (e) => {
     // console.log({firstFilter,secondFilter, thirdFilter, fourthFilter});
@@ -955,18 +966,22 @@ const createGraph = (id, type, graph, height, data) => {
             firstFilter = d.name;
             showRegionsGraphs(data, d);
             setPointData(data, firstFilter);
+            renderTable(data, firstFilter, secondFilter, thirdFilter, fourthFilter);
           } else if (countries.has(d.name)) {
             secondFilter = d.name;
             showCountriesGraphs(data, d, firstFilter);
             setPointData(data, firstFilter, secondFilter);
+            renderTable(data, firstFilter, secondFilter, thirdFilter, fourthFilter);
           } else if (leaguesKey.includes(d.name)) {
             thirdFilter = d.name;
             showTeamsGraphs(data, d, firstFilter, secondFilter);
             setPointData(data, firstFilter, secondFilter, thirdFilter);
+            renderTable(data, firstFilter, secondFilter, thirdFilter, fourthFilter);
           } else if (teamsKey.includes(d.name)) {
             fourthFilter = d.name;
             showFootbollmanGraphs(data, d, firstFilter, secondFilter, thirdFilter);
             setPointData(data, firstFilter, secondFilter, thirdFilter, fourthFilter);
+            renderTable(data, firstFilter, secondFilter, thirdFilter, fourthFilter);
           }
       }
       })
@@ -1027,10 +1042,52 @@ const createGraph = (id, type, graph, height, data) => {
 // createGraph('#graphLeft', 'left', graph1);
 // createGraph('#graphRight', 'right', graph2);
 
-const renderTable = (data) => {
 
-  for (let i = 0; i < 10; i++) {
-    const transfer = data[i];
+const renderTable = (data, firstFilter, secondFilter, thirdFilter, fourthFilter) => {
+  let dataset = data;
+  // console.log(firstFilter, secondFilter, thirdFilter, fourthFilter);
+  tableContent.innerHTML = '';
+
+  if (firstFilter && secondFilter && thirdFilter && fourthFilter) {
+    dataset = dataset.filter(d => (
+      (d[fromRegionField] === firstFilter || 
+      d[toRegionField] === firstFilter) && 
+      (d[fromCountryField] === secondFilter || 
+      d[toCountryField] === secondFilter) &&
+      (d[fromLeagueField] === thirdFilter || 
+      d[toLeagueField] === thirdFilter) &&
+      (d[fromTeamField] === fourthFilter || 
+      d[toTeamField] === fourthFilter)
+    ));
+  } else if (firstFilter && secondFilter && thirdFilter) {
+    dataset = dataset.filter(d => (
+      (d[fromRegionField] === firstFilter || 
+      d[toRegionField] === firstFilter) && 
+      (d[fromCountryField] === secondFilter || 
+      d[toCountryField] === secondFilter) &&
+      (d[fromLeagueField] === thirdFilter || 
+      d[toLeagueField] === thirdFilter)
+    ));
+  } else if (firstFilter && secondFilter) {
+    dataset = dataset.filter(d => (
+      (d[fromRegionField] === firstFilter || 
+      d[toRegionField] === firstFilter) && 
+      (d[fromCountryField] === secondFilter || 
+      d[toCountryField] === secondFilter)
+    ));
+  } else if (firstFilter) {
+    dataset = dataset.filter(d => (
+      d[fromRegionField] === firstFilter || 
+      d[toRegionField] === firstFilter
+    ));
+  }
+
+  const length = page * limit > dataset.length ? dataset.length : page * limit;
+  if (page * limit > dataset.length) {
+    buttonLoadMore.remove();
+  }
+  for (let i = 0; i < length; i++) {
+    const transfer = dataset[i];
     const row = createRow(transfer);
     tableContent.append(row);
   }

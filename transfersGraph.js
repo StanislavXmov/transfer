@@ -328,8 +328,9 @@ const createPoints = (data) => {
           return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy - 20;
         });
 
-    const maxh = Math.max(...Object.values(yState)) * 3;
-    axisYBottom.style.top = `${axisStep * 5 + maxh}px`;
+    // const maxh = Math.max(...Object.values(yState)) * 3;
+    // axisYBottom.style.top = `${axisStep * 5 + maxh}px`;
+    axisYBottom.style.top = `${axisStep * 6}px`;
 }
 
 const clearGraph = () => {
