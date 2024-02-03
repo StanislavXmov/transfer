@@ -19,7 +19,7 @@ import { fromCountries } from './filter/checked/fromCountries';
 import { toCountries } from './filter/checked/toCountries';
 import { fromLegues } from './filter/checked/fromLegues';
 import { toLeagues } from './filter/checked/toLeagues';
-import { fromCountryField, fromLeagueField, fromRegionField, fromTeamField, inType, insideType, outType, playerField, region, toCountryField, toLeagueField, toRegionField, toTeamField, typeField } from './fields';
+import { feeField, fromCountryField, fromLeagueField, fromRegionField, fromTeamField, inType, insideType, marketValueField, outType, playerField, region, toCountryField, toLeagueField, toRegionField, toTeamField, typeField } from './fields';
 import { fromLeagueToTeams } from './filter/teams/fromLeagueToTeams';
 import { fromLeagueToTeamsOut } from './filter/teams/fromLeagueToTeamsOut';
 import { fromTeams } from './filter/checked/fromTeams';
@@ -35,6 +35,8 @@ const container = document.getElementById('container');
 // table
 const tableContent = document.getElementById('tableContent');
 const buttonLoadMore = document.getElementById('loadMore');
+const tableMarketField = document.getElementById('tableMarketValue');
+const tableFeeField = document.getElementById('tableFeeValue');
 
 const titleWidth = 100;
 const clientWidth = (container.clientWidth - (titleWidth * 2) - 0) / 2;
@@ -72,6 +74,13 @@ const white = '#eeeeee';
 // table
 let page = 1;
 let limit = 100;
+let currentTableData = [];
+
+// null max min
+const max = 'max';
+const min = 'min';
+let marketTableFilter = null;
+let feeTableFilter = null;
 
 const createGraphsWithMoreNodes = (leftData, rightData, newHeight, data) => {
   clearGraph(graphRightId, right);
@@ -380,6 +389,7 @@ const getCsv = async () => {
   setPointData(data);
 
   renderTable(data, firstFilter, secondFilter, thirdFilter, fourthFilter);
+
   buttonLoadMore.addEventListener('click', () => {
     page++;
     renderTable(data, firstFilter, secondFilter, thirdFilter, fourthFilter);
@@ -1042,9 +1052,22 @@ const createGraph = (id, type, graph, height, data) => {
 // createGraph('#graphLeft', 'left', graph1);
 // createGraph('#graphRight', 'right', graph2);
 
-
 const renderTable = (data, firstFilter, secondFilter, thirdFilter, fourthFilter) => {
-  let dataset = data;
+  let dataset = [...data];
+  
+  // check filters
+  if (marketTableFilter === max) {
+    dataset.sort((t1, t2) => formatMarketValue(t2[marketValueField]) - formatMarketValue(t1[marketValueField]));
+  } else if (marketTableFilter === min) {
+    dataset.sort((t1, t2) => formatMarketValue(t1[marketValueField]) - formatMarketValue(t2[marketValueField]));
+  }
+  
+  if (feeTableFilter === max) {
+    dataset.sort((t1, t2) => formatFeeValue(t2[feeField]) - formatFeeValue(t1[feeField]));
+  } else if (feeTableFilter === min) {
+    dataset.sort((t1, t2) => formatFeeValue(t1[feeField]) - formatFeeValue(t2[feeField]));
+  }
+
   // console.log(firstFilter, secondFilter, thirdFilter, fourthFilter);
   tableContent.innerHTML = '';
 
@@ -1082,6 +1105,12 @@ const renderTable = (data, firstFilter, secondFilter, thirdFilter, fourthFilter)
     ));
   }
 
+  // all table filters
+  if (!marketTableFilter && !feeTableFilter) {
+    currentTableData = dataset;
+  }
+  
+
   const length = page * limit > dataset.length ? dataset.length : page * limit;
   if (page * limit > dataset.length) {
     buttonLoadMore.remove();
@@ -1092,4 +1121,49 @@ const renderTable = (data, firstFilter, secondFilter, thirdFilter, fourthFilter)
     tableContent.append(row);
   }
 }
+
+const formatMarketValue = (s) => {
+  return Number(s.replaceAll(',', ''));
+}
+const formatFeeValue = (s) => {
+  if (s === '?') {
+    return 0
+  } else {
+    return Number(s);
+  }
+}
+
+tableMarketField.addEventListener('click', () => {
+  if (!marketTableFilter) {
+    marketTableFilter = max;
+    const data = [...currentTableData];
+    renderTable(data, firstFilter, secondFilter, thirdFilter, fourthFilter);
+    
+  } else if (marketTableFilter === max) {
+    marketTableFilter = min;
+    const data = [...currentTableData];
+    renderTable(data, firstFilter, secondFilter, thirdFilter, fourthFilter);
+    
+  } else if (marketTableFilter === min) {
+    marketTableFilter = null;
+    renderTable(currentTableData, firstFilter, secondFilter, thirdFilter, fourthFilter);
+  }
+});
+
+tableFeeField.addEventListener('click', () => {
+  if (!feeTableFilter) {
+    feeTableFilter = max;
+    const data = [...currentTableData];
+    renderTable(data, firstFilter, secondFilter, thirdFilter, fourthFilter);
+    
+  } else if (feeTableFilter === max) {
+    feeTableFilter = min;
+    const data = [...currentTableData];
+    renderTable(data, firstFilter, secondFilter, thirdFilter, fourthFilter);
+    
+  } else if (feeTableFilter === min) {
+    feeTableFilter = null;
+    renderTable(currentTableData, firstFilter, secondFilter, thirdFilter, fourthFilter);
+  }
+});
 
