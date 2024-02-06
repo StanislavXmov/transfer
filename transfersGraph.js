@@ -13,7 +13,9 @@ export const colors = {
 };
 const container = document.getElementById('transferContainer');
 const axisYTop = document.getElementById('axisYTop');
+const axisYTopBorder = document.getElementById('axisYTopBorder');
 const axisYBottom = document.getElementById('axisYBottom');
+const axisYBottomBorder = document.getElementById('axisYBottomBorder');
 const axisX = document.getElementById('axisX');
 const clientWidth = container.clientWidth;
 const transferInfo = document.getElementById('transferInfo');
@@ -52,6 +54,8 @@ const width = (axisData.length - 1) * axisStep + axisStep;
 const height = (axisData.length - 1) * axisStep + axisStep;
 
 axisYTop.style.top = `${axisStep * 2.5}px`;
+axisYTopBorder.style.top = `${axisStep * 2.5}px`;
+axisYTopBorder.style.width = `${axisStep * 5}px`;
 axisX.style.top = `${axisStep * 5 + 6}px`;
 axisX.style.left = `${axisStep * 5 + axisStep / 2}px`;
 
@@ -328,9 +332,12 @@ const createPoints = (data) => {
           return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy - 20;
         });
 
-    // const maxh = Math.max(...Object.values(yState)) * 3;
+    const maxh = Math.max(...Object.values(yState)) * 3;
     // axisYBottom.style.top = `${axisStep * 5 + maxh}px`;
     axisYBottom.style.top = `${axisStep * 6}px`;
+
+    axisYBottomBorder.style.top = `${axisStep * 5 + 38}px`;
+    axisYBottomBorder.style.width = `${maxh + 24}px`;
 }
 
 const clearGraph = () => {
