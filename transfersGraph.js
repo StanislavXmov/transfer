@@ -46,7 +46,6 @@ const axisDataString = {
 // min 45;
 // const axisStep = 75;
 const axisStep = Math.min(Math.round(clientWidth / 7), 100);
-console.log(axisStep);
 const paddingLeft = 32;
 const dy = axisStep * 1.65;
 
