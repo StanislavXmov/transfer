@@ -45,17 +45,18 @@ const axisDataString = {
 }
 // min 45;
 // const axisStep = 75;
+const axisStepY = Math.min(Math.round(clientWidth / 7), 80);
 const axisStep = Math.min(Math.round(clientWidth / 7), 100);
 const paddingLeft = 32;
 const dy = axisStep * 1.65;
 
 const width = (axisData.length - 1) * axisStep + axisStep;
-const height = (axisData.length - 1) * axisStep + axisStep;
+const height = (axisData.length - 1) * axisStepY + axisStepY;
 
-axisYTop.style.top = `${axisStep * 2.5}px`;
-axisYTopBorder.style.top = `${axisStep * 2.5}px`;
-axisYTopBorder.style.width = `${axisStep * 5}px`;
-axisX.style.top = `${axisStep * 5 + 6}px`;
+axisYTop.style.top = `${axisStepY * 2.5}px`;
+axisYTopBorder.style.top = `${axisStepY * 2.5}px`;
+axisYTopBorder.style.width = `${axisStepY * 5}px`;
+axisX.style.top = `${axisStepY * 5 + 6}px`;
 axisX.style.left = `${axisStep * 5 + axisStep / 2}px`;
 
 const axis = {
@@ -79,7 +80,7 @@ axisDataY.forEach((step, i) => {
 
   axis.y[step] = d3.scaleLinear()
     .domain([step, axisDataY[i + 1]])
-    .range([height - (i * axisStep),height - (i + 1) * axisStep]);
+    .range([height - (i * axisStepY),height - (i + 1) * axisStepY]);
 });
 
 const svg = d3.select('#transferContainer').append("svg")
@@ -274,6 +275,7 @@ const createPoints = (data) => {
           //     ${getX(d)(Number(d[marketValueField].split(',').join(''))) + paddingLeft - 3}, 
           //     ${getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy + 20 + n * 3 + 10})
           //   `;
+          return null;
         }
         return `
         translate(
@@ -294,6 +296,7 @@ const createPoints = (data) => {
           setYStatePL(d);
           // const n = yStatePL[Number(d[marketValueField].split(',').join(''))];
           // return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy + 20 + n * 3
+          return null;
         }
         
         return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy - 20;
@@ -310,6 +313,7 @@ const createPoints = (data) => {
             setYStatePR(d);
             // const n = yStatePR[Number(d[marketValueField].split(',').join(''))];
             // return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy + 20 + n * 3
+            return null;
           }
           
           return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy - 20;
@@ -326,6 +330,7 @@ const createPoints = (data) => {
             setYStatePC(d);
             // const n = yStatePC[Number(d[marketValueField].split(',').join(''))];
             // return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy + 20 + n * 3
+            return null;
           }
           
           return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy - 20;
@@ -382,6 +387,7 @@ export const setPointData = (data, firstFilter, secondFilter, thirdFilter, fourt
     }
 
     // console.log(filtered.length);
+    filtered = data.filter(t => t[feeField] !== '0' && t[feeField] !== '?');
     dataState = filtered;
     dataState = dataState.map((d, i) => ({...d, i}));
     createPoints(filtered);
@@ -410,6 +416,7 @@ export const setPointData = (data, firstFilter, secondFilter, thirdFilter, fourt
       );
     }
     // console.log(filtered.length);
+    filtered = data.filter(t => t[feeField] !== '0' && t[feeField] !== '?');
     dataState = filtered;
     dataState = dataState.map((d, i) => ({...d, i}));
     createPoints(filtered);
@@ -437,6 +444,7 @@ export const setPointData = (data, firstFilter, secondFilter, thirdFilter, fourt
       );
     }
     // console.log(filtered.length);
+    filtered = data.filter(t => t[feeField] !== '0' && t[feeField] !== '?');
     dataState = filtered;
     dataState = dataState.map((d, i) => ({...d, i}));
     createPoints(filtered);
@@ -451,6 +459,7 @@ export const setPointData = (data, firstFilter, secondFilter, thirdFilter, fourt
       d[fromRegionField] === firstFilter)
     );
     // console.log(filtered.length);
+    filtered = data.filter(t => t[feeField] !== '0' && t[feeField] !== '?');
     dataState = filtered;
     dataState = dataState.map((d, i) => ({...d, i}));
     createPoints(filtered);
@@ -462,6 +471,7 @@ export const setPointData = (data, firstFilter, secondFilter, thirdFilter, fourt
     );
 
     // console.log(filtered.length);
+    filtered = data.filter(t => t[feeField] !== '0' && t[feeField] !== '?');
     dataState = filtered;
     dataState = dataState.map((d, i) => ({...d, i}));
     createPoints(filtered);
