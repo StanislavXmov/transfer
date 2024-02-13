@@ -14,8 +14,8 @@ export const colors = {
 const container = document.getElementById('transferContainer');
 const axisYTop = document.getElementById('axisYTop');
 const axisYTopBorder = document.getElementById('axisYTopBorder');
-const axisYBottom = document.getElementById('axisYBottom');
-const axisYBottomBorder = document.getElementById('axisYBottomBorder');
+// const axisYBottom = document.getElementById('axisYBottom');
+// const axisYBottomBorder = document.getElementById('axisYBottomBorder');
 const axisX = document.getElementById('axisX');
 const clientWidth = container.clientWidth;
 const transferInfo = document.getElementById('transferInfo');
@@ -268,12 +268,12 @@ const createPoints = (data) => {
       .attr("transform", d => {
         if (d[feeField] === '0' || d[feeField] === '?') {
           setYState(d);
-          const n = yState[Number(d[marketValueField].split(',').join(''))];
-          return `
-            translate(
-              ${getX(d)(Number(d[marketValueField].split(',').join(''))) + paddingLeft - 3}, 
-              ${getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy + 20 + n * 3 + 10})
-            `;
+          // const n = yState[Number(d[marketValueField].split(',').join(''))];
+          // return `
+          //   translate(
+          //     ${getX(d)(Number(d[marketValueField].split(',').join(''))) + paddingLeft - 3}, 
+          //     ${getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy + 20 + n * 3 + 10})
+          //   `;
         }
         return `
         translate(
@@ -292,8 +292,8 @@ const createPoints = (data) => {
       .attr("data-top", d => {
         if (d[feeField] === '0' || d[feeField] === '?') {
           setYStatePL(d);
-          const n = yStatePL[Number(d[marketValueField].split(',').join(''))];
-          return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy + 20 + n * 3
+          // const n = yStatePL[Number(d[marketValueField].split(',').join(''))];
+          // return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy + 20 + n * 3
         }
         
         return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy - 20;
@@ -308,8 +308,8 @@ const createPoints = (data) => {
         .attr("data-top", d => {
           if (d[feeField] === '0' || d[feeField] === '?') {
             setYStatePR(d);
-            const n = yStatePR[Number(d[marketValueField].split(',').join(''))];
-            return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy + 20 + n * 3
+            // const n = yStatePR[Number(d[marketValueField].split(',').join(''))];
+            // return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy + 20 + n * 3
           }
           
           return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy - 20;
@@ -324,8 +324,8 @@ const createPoints = (data) => {
         .attr("data-top", d => {
           if (d[feeField] === '0' || d[feeField] === '?') {
             setYStatePC(d);
-            const n = yStatePC[Number(d[marketValueField].split(',').join(''))];
-            return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy + 20 + n * 3
+            // const n = yStatePC[Number(d[marketValueField].split(',').join(''))];
+            // return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy + 20 + n * 3
           }
           
           return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy - 20;
@@ -333,10 +333,10 @@ const createPoints = (data) => {
 
     const maxh = Math.max(...Object.values(yState)) * 3;
     // axisYBottom.style.top = `${axisStep * 5 + maxh}px`;
-    axisYBottom.style.top = `${axisStep * 6}px`;
+    // axisYBottom.style.top = `${axisStep * 6}px`;
 
-    axisYBottomBorder.style.top = `${axisStep * 5 + 38}px`;
-    axisYBottomBorder.style.width = `${maxh + 24}px`;
+    // axisYBottomBorder.style.top = `${axisStep * 5 + 38}px`;
+    // axisYBottomBorder.style.width = `${maxh + 24}px`;
 }
 
 const clearGraph = () => {
@@ -468,26 +468,3 @@ export const setPointData = (data, firstFilter, secondFilter, thirdFilter, fourt
   }
 }
 
-const getCsv = async () => {
-  const data = await d3.csv('./football-transfers.csv');
-  // console.log(data);
-
-  // dataState = data;
-  // createPoints(data);
-
-  let filtered = [];
-  const filteredByType = data.filter(d => 
-    d[typeField] === inType || d[typeField] === insideType || d[typeField] === outType);
-
-  filtered = filteredByType.filter(d => 
-    d[fromCountryField] === 'Germany' 
-    && d[toRegionField] === region 
-    && d[fromRegionField] !== region
-  );
-
-  console.log(filtered);
-  dataState = filtered;
-  createPoints(filtered);
-}
-
-// getCsv();

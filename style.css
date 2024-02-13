@@ -42,7 +42,7 @@ body {
 }
 
 .leftTitle {
-  padding-left: 142px;
+  padding-left: 16px;
   text-align: left;
 }
 
@@ -54,7 +54,7 @@ body {
 }
 
 .rightTitle {
-  padding-right: 142px;
+  padding-right: 16px;
   text-align: right;
 }
 
