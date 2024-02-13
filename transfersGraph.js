@@ -55,8 +55,9 @@ const height = (axisData.length - 1) * axisStepY + axisStepY;
 
 axisYTop.style.top = `${axisStepY * 2.5}px`;
 axisYTopBorder.style.top = `${axisStepY * 2.5}px`;
-axisYTopBorder.style.width = `${axisStepY * 5}px`;
-axisX.style.top = `${axisStepY * 5 + 6}px`;
+axisYTopBorder.style.width = `${axisStepY * 4.5}px`;
+// axisX.style.top = `${axisStepY * 5 + 6}px`;
+axisX.style.top = `${height - axisStepY / 4 - dy + 3}px`;
 axisX.style.left = `${axisStep * 5 + axisStep / 2}px`;
 
 const axis = {
@@ -85,8 +86,10 @@ axisDataY.forEach((step, i) => {
 
 const svg = d3.select('#transferContainer').append("svg")
   .attr("width", width)
-  .attr("height", 900 + 10)
-  .attr("viewBox", [0, 0, width, 900])
+  .attr("height", axisStepY * 5 + 10)
+  .attr("viewBox", [0, 0, width, axisStepY * 5])
+  // .attr("height", 900 + 10)
+  // .attr("viewBox", [0, 0, width, 900])
   // .attr("style", "max-width: 100%; height: auto;");
 
 Object.keys(axis.x).forEach(key => {
@@ -94,7 +97,7 @@ Object.keys(axis.x).forEach(key => {
     return;
   }
   svg.append("g")
-    .attr("transform", `translate(${paddingLeft},${height - axisStep / 4 - dy })`)
+    .attr("transform", `translate(${paddingLeft},${height - axisStepY / 4 - dy })`)
     .attr("class", `domainX`)
     .call(d3.axisBottom(axis.x[key]).ticks(1).tickFormat((d => `${axisDataString[d]}`)))
     .call(g => g.select(".domain").remove());
@@ -387,7 +390,7 @@ export const setPointData = (data, firstFilter, secondFilter, thirdFilter, fourt
     }
 
     // console.log(filtered.length);
-    filtered = data.filter(t => t[feeField] !== '0' && t[feeField] !== '?');
+    filtered = filtered.filter(t => t[feeField] !== '0' && t[feeField] !== '?');
     dataState = filtered;
     dataState = dataState.map((d, i) => ({...d, i}));
     createPoints(filtered);
@@ -416,7 +419,7 @@ export const setPointData = (data, firstFilter, secondFilter, thirdFilter, fourt
       );
     }
     // console.log(filtered.length);
-    filtered = data.filter(t => t[feeField] !== '0' && t[feeField] !== '?');
+    filtered = filtered.filter(t => t[feeField] !== '0' && t[feeField] !== '?');
     dataState = filtered;
     dataState = dataState.map((d, i) => ({...d, i}));
     createPoints(filtered);
@@ -444,7 +447,7 @@ export const setPointData = (data, firstFilter, secondFilter, thirdFilter, fourt
       );
     }
     // console.log(filtered.length);
-    filtered = data.filter(t => t[feeField] !== '0' && t[feeField] !== '?');
+    filtered = filtered.filter(t => t[feeField] !== '0' && t[feeField] !== '?');
     dataState = filtered;
     dataState = dataState.map((d, i) => ({...d, i}));
     createPoints(filtered);
@@ -459,7 +462,7 @@ export const setPointData = (data, firstFilter, secondFilter, thirdFilter, fourt
       d[fromRegionField] === firstFilter)
     );
     // console.log(filtered.length);
-    filtered = data.filter(t => t[feeField] !== '0' && t[feeField] !== '?');
+    filtered = filtered.filter(t => t[feeField] !== '0' && t[feeField] !== '?');
     dataState = filtered;
     dataState = dataState.map((d, i) => ({...d, i}));
     createPoints(filtered);
@@ -471,7 +474,7 @@ export const setPointData = (data, firstFilter, secondFilter, thirdFilter, fourt
     );
 
     // console.log(filtered.length);
-    filtered = data.filter(t => t[feeField] !== '0' && t[feeField] !== '?');
+    filtered = filtered.filter(t => t[feeField] !== '0' && t[feeField] !== '?');
     dataState = filtered;
     dataState = dataState.map((d, i) => ({...d, i}));
     createPoints(filtered);

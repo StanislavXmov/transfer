@@ -202,6 +202,7 @@ body {
 
 .axisX {
   position: absolute;
+  transform: translateY(50%);
   top: 700px;
   left: 200px;
 
