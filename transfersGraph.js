@@ -215,6 +215,35 @@ const circleOver = (e) => {
   }
 }
 
+const feeCircleOver = (e) => {
+  if (e.target.dataset.index && selected !== e.target.dataset.index) {
+    selected = e.target.dataset.index;
+    const d = dataFeeState[Number(e.target.dataset.index)];
+    if (d) {
+      transferInfo.style.display = 'block';
+      if (document.body.clientWidth <= 1200) {
+        transferInfo.style.left = `${Number(e.target.dataset.left) + 10}px`;
+        transferInfo.style.top = `${Number(e.target.dataset.top) + axisStepY * 5 - 6}px`
+      } else {
+        transferInfo.style.width = `320px`;
+        transferInfo.style.left = `${Number(e.target.dataset.left) - 330}px`;
+        transferInfo.style.top = `${Number(e.target.dataset.top) + axisStepY * 5 - 6}px`;
+      }
+      
+      name.textContent = d[playerField];
+      age.textContent = d['Age'];
+      fromTeam.textContent = d[fromTeamField];
+      fromLeague.textContent = d[fromLeagueField];
+      fromCountry.textContent = d[fromCountryField];
+      toTeam.textContent = d[toTeamField];
+      toLeague.textContent = d[toLeagueField];
+      toCountry.textContent = d[toCountryField];
+      marketValue.textContent = Number(d[marketValueField].split(',').join('')).toLocaleString();
+      fee.textContent = Number(d[feeField]).toLocaleString();
+    }
+  }
+}
+
 const circleOut = (e) => {
   transferInfo.style.display = 'none';
   selected = '-1';
@@ -372,8 +401,8 @@ const createFeePoints = (data) => {
     .selectAll()
     .data(data)
     .join("g")
-      // .on('mouseover', circleOver)
-      // .on('mouseout', circleOut)
+      .on('mouseover', feeCircleOver)
+      .on('mouseout', circleOut)
       .style("cursor", "pointer")
       .attr("transform", d => {
         const x = getX(d)(getMarketValue(d[marketValueField])) + paddingLeft - 3;
@@ -412,35 +441,49 @@ const createFeePoints = (data) => {
           return height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) + n * 3 + 3;
         }
       })
-      // .select(function() { return this.parentNode; })
-      // .append("path")
-      //   .attr("d", d1)
-      //   .attr("fill", d => getFromColor(d))
-      //   .attr("data-index", (d, i) => i)
-      //   .attr("data-left", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + paddingLeft - 3)
-      //   // .attr("data-top", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy)
-      //   .attr("data-top", d => {
-      //       setYStatePR(d);
-      //       const n = yStatePR[Number(d[marketValueField].split(',').join(''))];
-      //       return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy + 20 + n * 3
-      //   })
-      //   .select(function() { return this.parentNode; })
-      //   .append("path")
-      //   .attr("d", d2)
-      //   .attr("fill", d => getToColor(d))
-      //   .attr("data-index", (d, i) => i)
-      //   .attr("data-left", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + paddingLeft - 3)
-      //   .attr("data-top", d => {
-      //       setYStatePC(d);
-      //       const n = yStatePC[Number(d[marketValueField].split(',').join(''))];
-      //       return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy + 20 + n * 3
-      //   });
+      .select(function() { return this.parentNode; })
+      .append("path")
+        .attr("d", d1)
+        .attr("fill", d => getFromColor(d))
+        .attr("data-index", (d, i) => i)
+        .attr("data-left", d => getX(d)(getMarketValue(d[marketValueField])) + paddingLeft - 3)
+        // .attr("data-top", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy)
+        .attr("data-top", d => {
+          if (d[typeField] === insideType || d[typeField] === inType) {
+            setState(d, yInStatePR);
+            const n = yInStatePR[getMarketValue(d[marketValueField])];
+            return height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) - n * 3 - 3;
+          } else {
+            setState(d, yOutStatePR);
+            const n = yOutStatePR[getMarketValue(d[marketValueField])];
+            return height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) + n * 3 + 3;
+          }
+        })
+        .select(function() { return this.parentNode; })
+        .append("path")
+        .attr("d", d2)
+        .attr("fill", d => getToColor(d))
+        .attr("data-index", (d, i) => i)
+        .attr("data-left", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + paddingLeft - 3)
+        .attr("data-top", d => {
+            if (d[typeField] === insideType || d[typeField] === inType) {
+              setState(d, yInStatePC);
+              const n = yInStatePC[getMarketValue(d[marketValueField])];
+              return height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) - n * 3 - 3;
+            } else {
+              setState(d, yOutStatePC);
+              const n = yOutStatePC[getMarketValue(d[marketValueField])];
+              return height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) + n * 3 + 3;
+            }
+        });
 }
 
 const clearGraph = () => {
   // #transferContainer
   const group1 = document.querySelector('#group1');
+  const group2 = document.querySelector('#group2');
   group1 && group1.remove();
+  group2 && group2.remove();
 }
 
 export const setPointData = (data, firstFilter, secondFilter, thirdFilter, fourthFilter) => {
@@ -485,6 +528,7 @@ export const setPointData = (data, firstFilter, secondFilter, thirdFilter, fourt
     dataState = filtered;
     dataState = dataState.map((d, i) => ({...d, i}));
     createPoints(filtered);
+    createFeePoints(dataFeeState);
   } else if (firstFilter && secondFilter && thirdFilter) {
     const filteredByType = data.filter(d => 
       d[typeField] === inType || d[typeField] === insideType || d[typeField] === outType);
@@ -515,6 +559,7 @@ export const setPointData = (data, firstFilter, secondFilter, thirdFilter, fourt
     dataState = filtered;
     dataState = dataState.map((d, i) => ({...d, i}));
     createPoints(filtered);
+    createFeePoints(dataFeeState);
   } else if (firstFilter && secondFilter) {
     const filteredByType = data.filter(d => 
       d[typeField] === inType || d[typeField] === insideType || d[typeField] === outType);
@@ -544,6 +589,7 @@ export const setPointData = (data, firstFilter, secondFilter, thirdFilter, fourt
     dataState = filtered;
     dataState = dataState.map((d, i) => ({...d, i}));
     createPoints(filtered);
+    createFeePoints(dataFeeState);
   } else if (firstFilter) {
 
     const filteredByType = data.filter(d => 
