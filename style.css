@@ -68,7 +68,7 @@ body {
 
 .transferContainer {
   position: relative;
-  margin: 0 auto 64px;
+  margin: 0 auto;
   width: 100%;
   /* border: 2px dashed #c1c2c1; */
 }
@@ -257,4 +257,9 @@ svg g text {
   display: block;
   line-height: 12px;
   font-size: 12px;
+}
+
+.feePoints {
+  margin-top: -10px;
+  border: 2px solid #c1c0c0;
 }
