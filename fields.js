@@ -22,6 +22,7 @@
 // ]
 
 export const playerField = "Player";
+export const transferIdField = "Transfer ID";
 export const typeField = "";
 export const fromRegionField = "From Region";
 export const fromCountryField = "From Country";

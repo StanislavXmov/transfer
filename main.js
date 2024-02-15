@@ -19,7 +19,7 @@ import { fromCountries } from './filter/checked/fromCountries';
 import { toCountries } from './filter/checked/toCountries';
 import { fromLegues } from './filter/checked/fromLegues';
 import { toLeagues } from './filter/checked/toLeagues';
-import { feeField, fromCountryField, fromLeagueField, fromRegionField, fromTeamField, inType, insideType, marketValueField, outType, playerField, region, toCountryField, toLeagueField, toRegionField, toTeamField, typeField } from './fields';
+import { feeField, fromCountryField, fromLeagueField, fromRegionField, fromTeamField, inType, insideType, marketValueField, outType, playerField, region, toCountryField, toLeagueField, toRegionField, toTeamField, transferIdField, typeField } from './fields';
 import { fromLeagueToTeams } from './filter/teams/fromLeagueToTeams';
 import { fromLeagueToTeamsOut } from './filter/teams/fromLeagueToTeamsOut';
 import { fromTeams } from './filter/checked/fromTeams';
@@ -741,7 +741,9 @@ const onHoverPath = (path) => {
 
   // console.log('filtered', filtered);
   filtered.forEach((d) => {
-    d3.selectAll(`[data-index="${d.i}"]`)
+    // console.log(d[transferIdField]);
+    d3.selectAll(`[data-index="${d[transferIdField]}"]`)
+    // d3.selectAll(`[data-index="${d.i}"]`)
     .style("opacity", 1)
     // .style("z-index", 100);
   });

@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { feeField, fromCountryField, fromLeagueField, fromRegionField, fromTeamField, inType, insideType, marketValueField, outType, playerField, region, toCountryField, toLeagueField, toRegionField, toTeamField, typeField } from './fields';
+import { feeField, fromCountryField, fromLeagueField, fromRegionField, fromTeamField, inType, insideType, marketValueField, outType, playerField, region, toCountryField, toLeagueField, toRegionField, toTeamField, transferIdField, typeField } from './fields';
 
 export const colors = {
   'Top': '#FEFEFE',
@@ -175,16 +175,18 @@ const getToColor = (d) => {
   return colors[d[toRegionField]] || colors['No club'];
 }
 
+let allDataState = [];
 let dataState = [];
 let dataFeeState = [];
 let selected = '-1';
 
-export const getPointsData = () => dataState;
+export const getPointsData = () => allDataState;
 
 const circleOver = (e) => {
   if (e.target.dataset.index && selected !== e.target.dataset.index) {
     selected = e.target.dataset.index;
-    const d = dataState[Number(e.target.dataset.index)];
+    const d = dataState.find(t => t[transferIdField] === e.target.dataset.index);
+    // const d = dataState[Number(e.target.dataset.index)];
     if (d) {
       transferInfo.style.display = 'block';
       if (document.body.clientWidth <= 1200) {
@@ -218,7 +220,8 @@ const circleOver = (e) => {
 const feeCircleOver = (e) => {
   if (e.target.dataset.index && selected !== e.target.dataset.index) {
     selected = e.target.dataset.index;
-    const d = dataFeeState[Number(e.target.dataset.index)];
+    // const d = dataFeeState[Number(e.target.dataset.index)];
+    const d = dataFeeState.find(t => t[transferIdField] === e.target.dataset.index);
     if (d) {
       transferInfo.style.display = 'block';
       if (document.body.clientWidth <= 1200) {
@@ -294,7 +297,7 @@ const createPoints = (data) => {
       .attr("r", 3.5)
       .attr("stroke", "#00000060")
       .attr("fill", "none")
-      .attr("data-index", (d, i) => i)
+      .attr("data-index", (d, i) => d[transferIdField])
       .attr("data-left", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + paddingLeft - 3)
       // .attr("data-top", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy)
       .attr("data-top", d => {
@@ -311,7 +314,7 @@ const createPoints = (data) => {
       .append("path")
         .attr("d", d1)
         .attr("fill", d => getFromColor(d))
-        .attr("data-index", (d, i) => i)
+        .attr("data-index", (d, i) => d[transferIdField])
         .attr("data-left", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + paddingLeft - 3)
         // .attr("data-top", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy)
         .attr("data-top", d => {
@@ -328,7 +331,7 @@ const createPoints = (data) => {
         .append("path")
         .attr("d", d2)
         .attr("fill", d => getToColor(d))
-        .attr("data-index", (d, i) => i)
+        .attr("data-index", (d, i) => d[transferIdField])
         .attr("data-left", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + paddingLeft - 3)
         // .attr("data-top", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy);
         .attr("data-top", d => {
@@ -462,7 +465,7 @@ const createFeePoints = (data) => {
       .attr("r", 3.5)
       .attr("stroke", "#00000060")
       .attr("fill", "none")
-      .attr("data-index", (d, i) => i)
+      .attr("data-index", (d, i) => d[transferIdField])
       .attr("data-left", d => getX(d)(getMarketValue(d[marketValueField])) + paddingLeft - 3)
       .attr("data-top", d => {
         if (d[typeField] === insideType || d[typeField] === inType) {
@@ -479,7 +482,7 @@ const createFeePoints = (data) => {
       .append("path")
         .attr("d", d1)
         .attr("fill", d => getFromColor(d))
-        .attr("data-index", (d, i) => i)
+        .attr("data-index", (d, i) => d[transferIdField])
         .attr("data-left", d => getX(d)(getMarketValue(d[marketValueField])) + paddingLeft - 3)
         // .attr("data-top", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy)
         .attr("data-top", d => {
@@ -497,7 +500,7 @@ const createFeePoints = (data) => {
         .append("path")
         .attr("d", d2)
         .attr("fill", d => getToColor(d))
-        .attr("data-index", (d, i) => i)
+        .attr("data-index", (d, i) => d[transferIdField])
         .attr("data-left", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + paddingLeft - 3)
         .attr("data-top", d => {
             if (d[typeField] === insideType || d[typeField] === inType) {
@@ -524,6 +527,7 @@ export const setPointData = (data, firstFilter, secondFilter, thirdFilter, fourt
   clearGraph();
 
   let filtered = [];
+  allDataState = data;
   // console.log({firstFilter, secondFilter, thirdFilter, fourthFilter});
 
   if (firstFilter && secondFilter && thirdFilter && fourthFilter) {
