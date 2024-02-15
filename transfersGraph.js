@@ -375,25 +375,45 @@ const addFeeAxisTitles = () => {
 const createFeePoints = (data) => {
   const inDataState = {};
   const outDataState = {};
-  const inData = data.filter(t => t[typeField] === inType);
+  const inData = data.filter(t => t[typeField] === insideType || t[typeField] === inType);
   const outData = data.filter(t => t[typeField] === outType);
   inData.forEach(t => {
     if (inDataState[getMarketValue(t[marketValueField])]) {
-      inDataState[getMarketValue(t[marketValueField])] += 1;
+      inDataState[getMarketValue(t[marketValueField])].counter += 1;
     } else {
-      inDataState[getMarketValue(t[marketValueField])] = 1;
+      inDataState[getMarketValue(t[marketValueField])] = {};
+      inDataState[getMarketValue(t[marketValueField])].counter = 1;
     }
   });
   outData.forEach(t => {
     if (outDataState[getMarketValue(t[marketValueField])]) {
-      outDataState[getMarketValue(t[marketValueField])] += 1;
+      outDataState[getMarketValue(t[marketValueField])].counter += 1;
     } else {
-      outDataState[getMarketValue(t[marketValueField])] = 1;
+      outDataState[getMarketValue(t[marketValueField])] = {};
+      outDataState[getMarketValue(t[marketValueField])].counter = 1;
     }
   });
 
-  const maxhIn = Math.max(...Object.values(inDataState)) * 3;
-  const maxhOut = Math.max(...Object.values(outDataState)) * 3;
+  
+  const maxIn = Math.max(...Object.values(inDataState).map(v => v.counter))
+  const maxOut = Math.max(...Object.values(outDataState).map(v => v.counter));
+  for (const fee in inDataState) {
+    if (inDataState[fee].counter / maxIn > 0.75 && inDataState[fee].counter > 20) {
+      inDataState[fee].n = 3;
+    } else {
+      inDataState[fee].n = 6;
+    }
+  }
+  for (const fee in outDataState) {
+    if (outDataState[fee].counter / maxIn > 0.75 && outDataState[fee].counter > 20) {
+      outDataState[fee].n = 3;
+    } else {
+      outDataState[fee].n = 6;
+    }
+  }
+
+  const maxhIn = maxIn * 3;
+  const maxhOut = maxOut * 3;
   let height = Math.max(maxhIn * 2, maxhOut * 2) + 24;
   height = Math.max(height, 200);
 
@@ -410,12 +430,22 @@ const createFeePoints = (data) => {
       .attr("width", width)
       .attr("height", height)
       .attr("viewBox", [0, 0, width, height]);
+
   } else {
     svg = d3.select('#feePoints')
       .attr("width", width)
       .attr("height", height)
       .attr("viewBox", [0, 0, width, height]);
   }
+
+  svg.append('line')
+    .attr("id", 'feeLine')
+    .attr('x1', axis.x['0'](0) + paddingLeft - 10)
+    .attr('y1', height / 2 + 2)
+    .attr('x2', axis.x['100000000'](110000000))
+    .attr('y2', height / 2 + 2)
+    .attr('stroke', 'rgba(0, 0, 0, 0.2)')
+    .style('stroke-width', '0.4px');
 
   const axisYFee = document.getElementById('axisYFee');
   const axisYFeeBorder = document.getElementById('axisYFeeBorder');
@@ -447,11 +477,13 @@ const createFeePoints = (data) => {
         if (d[typeField] === insideType || d[typeField] === inType) {
           setState(d, yInState);
           const n = yInState[getMarketValue(d[marketValueField])];
-          y = height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) - n * 3 - 3;
+          const dy = inDataState[getMarketValue(d[marketValueField])].n;
+          y = height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) - n * dy - 3;
         } else {
           setState(d, yOutState);
           const n = yOutState[getMarketValue(d[marketValueField])];
-          y = height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) + n * 3 + 3;
+          const dy = outDataState[getMarketValue(d[marketValueField])].n;
+          y = height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) + n * dy + 3;
         }
         return `
           translate(
@@ -471,11 +503,13 @@ const createFeePoints = (data) => {
         if (d[typeField] === insideType || d[typeField] === inType) {
           setState(d, yInStatePL);
           const n = yInStatePL[getMarketValue(d[marketValueField])];
-          return height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) - n * 3 - 3;
+          const dy = inDataState[getMarketValue(d[marketValueField])].n;
+          return height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) - n * dy - 3;
         } else {
           setState(d, yOutStatePL);
           const n = yOutStatePL[getMarketValue(d[marketValueField])];
-          return height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) + n * 3 + 3;
+          const dy = outDataState[getMarketValue(d[marketValueField])].n;
+          return height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) + n * dy + 3;
         }
       })
       .select(function() { return this.parentNode; })
@@ -489,11 +523,13 @@ const createFeePoints = (data) => {
           if (d[typeField] === insideType || d[typeField] === inType) {
             setState(d, yInStatePR);
             const n = yInStatePR[getMarketValue(d[marketValueField])];
-            return height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) - n * 3 - 3;
+            const dy = inDataState[getMarketValue(d[marketValueField])].n;
+            return height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) - n * dy - 3;
           } else {
             setState(d, yOutStatePR);
             const n = yOutStatePR[getMarketValue(d[marketValueField])];
-            return height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) + n * 3 + 3;
+            const dy = outDataState[getMarketValue(d[marketValueField])].n;
+            return height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) + n * dy + 3;
           }
         })
         .select(function() { return this.parentNode; })
@@ -506,11 +542,13 @@ const createFeePoints = (data) => {
             if (d[typeField] === insideType || d[typeField] === inType) {
               setState(d, yInStatePC);
               const n = yInStatePC[getMarketValue(d[marketValueField])];
-              return height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) - n * 3 - 3;
+              const dy = inDataState[getMarketValue(d[marketValueField])].n;
+              return height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) - n * dy - 3;
             } else {
               setState(d, yOutStatePC);
               const n = yOutStatePC[getMarketValue(d[marketValueField])];
-              return height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) + n * 3 + 3;
+              const dy = outDataState[getMarketValue(d[marketValueField])].n;
+              return height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) + n * dy + 3;
             }
         });
 }
@@ -519,8 +557,10 @@ const clearGraph = () => {
   // #transferContainer
   const group1 = document.querySelector('#group1');
   const group2 = document.querySelector('#group2');
+  const line = document.querySelector('#feeLine');
   group1 && group1.remove();
   group2 && group2.remove();
+  line && line.remove();
 }
 
 export const setPointData = (data, firstFilter, secondFilter, thirdFilter, fourthFilter) => {
