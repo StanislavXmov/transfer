@@ -220,9 +220,7 @@ svg g text {
 }
 
 .tableWrapper {
-  margin: 0px;
-  margin-bottom: 200px;
-
+  margin: 24px 0;
   border: 1px solid #c1c0c0;
 }
 
@@ -261,5 +259,58 @@ svg g text {
 
 .feePoints {
   margin-top: -10px;
-  border: 2px solid #c1c0c0;
+  
+}
+
+.feePointsWrapper {
+  margin-top: -10px;
+  position: relative;
+  /* border: 2px solid #c1c0c0; */
+}
+
+.axisYFee {
+  text-align: center;
+  position: absolute;
+  top: 0px;
+  left: -14px;
+  transform-origin: top left;
+  transform: rotateZ(-90deg) translateX(-100%);
+
+  font-size: 12px;
+}
+
+.axisYFeeIn {
+  text-align: center;
+  position: absolute;
+  top: 32px;
+  left: 0px;
+  transform-origin: top left;
+  transform: rotateZ(-90deg) translateX(-100%);
+
+  font-size: 14px;
+}
+
+.axisYFeeOut {
+  text-align: center;
+  position: absolute;
+  bottom: 32px;
+  left: 0px;
+  transform-origin: top left;
+  transform: rotateZ(-90deg) translateX(-100%);
+
+  font-size: 14px;
+}
+
+.axisYFeeBorder {
+  position: absolute;
+  top: 0px;
+  left: -1px;
+  transform-origin: top left;
+  transform: rotateZ(-90deg) translateX(calc(-100% + 6px));
+  height: 6px;
+  width: 16px;
+  min-width: 200px;
+  border-top: 1px solid rgba(0, 0, 0, 0.2);
+  border-left: 1px solid rgba(0, 0, 0, 0.2);
+  border-right: 1px solid rgba(0, 0, 0, 0.2);
 }

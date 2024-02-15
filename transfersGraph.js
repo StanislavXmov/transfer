@@ -350,6 +350,25 @@ const createPoints = (data) => {
     // axisYBottomBorder.style.width = `${maxh + 24}px`;
 }
 
+const addFeeAxisTitles = () => {
+  const wrapper = d3.select('.feePointsWrapper');
+  wrapper.append('div')
+    .attr("class", 'axisYFee')
+    .attr("id", 'axisYFee')
+    .text('Free transfers');
+  wrapper.append('div')
+    .attr("class", 'axisYFeeIn')
+    .attr("id", 'axisYFeeIn')
+    .text('In');
+  wrapper.append('div')
+    .attr("class", 'axisYFeeOut')
+    .attr("id", 'axisYFeeOut')
+    .text('Out');
+  wrapper.append('div')
+    .attr("class", 'axisYFeeBorder')
+    .attr("id", 'axisYFeeBorder');
+}
+
 const createFeePoints = (data) => {
   const inDataState = {};
   const outDataState = {};
@@ -372,19 +391,34 @@ const createFeePoints = (data) => {
 
   const maxhIn = Math.max(...Object.values(inDataState)) * 3;
   const maxhOut = Math.max(...Object.values(outDataState)) * 3;
-  const height = Math.max(maxhIn * 2, maxhOut * 2) + 24;
+  let height = Math.max(maxhIn * 2, maxhOut * 2) + 24;
+  height = Math.max(height, 200);
 
   let svg = null;
   if (!document.getElementById('feePoints')) {
-    svg = d3.select('#transferContainer').append("svg")
+    const wrapper = d3.select('#transferContainer').append("div");
+    wrapper.attr("class", 'feePointsWrapper');
+
+    addFeeAxisTitles();
+
+    svg = wrapper.append("svg")
       .attr("class", 'feePoints')
       .attr("id", 'feePoints')
       .attr("width", width)
       .attr("height", height)
       .attr("viewBox", [0, 0, width, height]);
   } else {
-    svg = d3.select('#feePoints');
+    svg = d3.select('#feePoints')
+      .attr("width", width)
+      .attr("height", height)
+      .attr("viewBox", [0, 0, width, height]);
   }
+
+  const axisYFee = document.getElementById('axisYFee');
+  const axisYFeeBorder = document.getElementById('axisYFeeBorder');
+
+  axisYFee.style.width = `${height}px`;
+  axisYFeeBorder.style.width = `${height}px`;
 
   yInState = {};
   yInStatePL = {};
