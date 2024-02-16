@@ -32,6 +32,7 @@ import { colors } from './transfersGraph';
 import { createRow } from './tableUtils';
 
 const container = document.getElementById('container');
+const pathContainer = document.querySelector('.pathContainer');
 // table
 const tableContent = document.getElementById('tableContent');
 const buttonLoadMore = document.getElementById('loadMore');
@@ -756,6 +757,11 @@ const clearGraph = (id, type) => {
 }
 
 const createGraph = (id, type, graph, height, data) => {
+  if (height + margin.top + margin.bottom > 700) {
+    pathContainer.style.overflowY = 'scroll';
+  } else {
+    pathContainer.style.overflowY = 'hidden';
+  }
   const svg = d3.select(id).append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)

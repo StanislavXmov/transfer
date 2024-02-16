@@ -215,6 +215,12 @@ body {
   /* gap: 16px; */
 }
 
+.pathContainer {
+  max-height: 700px;
+  overflow-y: hidden;
+  overflow-x: hidden;
+}
+
 svg g text {
   font-size: 9px;
 }
