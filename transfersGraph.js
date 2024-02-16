@@ -58,7 +58,7 @@ axisYTopBorder.style.top = `${axisStepY * 2.5}px`;
 axisYTopBorder.style.width = `${axisStepY * 4.5}px`;
 // axisX.style.top = `${axisStepY * 5 + 6}px`;
 axisX.style.top = `${height - axisStepY / 4 - dy + 3}px`;
-axisX.style.left = `${axisStep * 5 + axisStep / 2}px`;
+axisX.style.left = `${axisStep * 5 + axisStep / 2 + 10}px`;
 
 const axis = {
   x: {},
@@ -103,8 +103,27 @@ Object.keys(axis.x).forEach(key => {
     .call(g => g.select(".domain").remove());
 });
 
+const lineGroup = svg.append('g')
+    .attr("id", 'line');
+    
+  for (let i = 0; i < 6; i++) {
+    lineGroup.append('path')
+    .attr("d", `M${axisStep * i + paddingLeft} ${height - axisStepY / 4 - dy + 6}V${height - axisStepY / 4 - dy + 18}`)
+    .attr('stroke', '#E0E0E0');
+  }
+
 svg.selectAll('.domainX')
   .selectAll("line").remove();
+
+  svg.selectAll('.domainX')
+    .selectAll("text")
+    .attr("text-anchor", 'start');
+
+svg.selectAll('.tick')
+  .attr('transform', (d, i, e) => {
+    const x = Number(e[i].getAttribute('transform').split('(')[1].split(',')[0]);
+    return `translate(${x + 2}, 0)`;
+  });
 
 Object.keys(axis.y).forEach(key => {
   if (Number(key) === axisData[axisData.length - 2]) {
@@ -438,14 +457,17 @@ const createFeePoints = (data) => {
       .attr("viewBox", [0, 0, width, height]);
   }
 
-  svg.append('line')
-    .attr("id", 'feeLine')
-    .attr('x1', axis.x['0'](0) + paddingLeft - 10)
-    .attr('y1', height / 2 + 2)
-    .attr('x2', axis.x['100000000'](110000000))
-    .attr('y2', height / 2 + 2)
-    .attr('stroke', 'rgba(0, 0, 0, 0.2)')
-    .style('stroke-width', '0.4px');
+  const feeLineGroup = svg.append('g')
+    .attr("id", 'feeLine');
+  feeLineGroup.append('path')
+    .attr("d", `M${axis.x['0'](0) + paddingLeft - 10} ${height / 2 + 2}H${axis.x['100000000'](400000000)}`)
+    .attr('stroke', '#E0E0E0');
+
+  for (let i = 0; i < 6; i++) {
+    feeLineGroup.append('path')
+    .attr("d", `M${axisStep * i + paddingLeft} ${height / 2 + 6}V${height / 2 - 2}`)
+    .attr('stroke', '#E0E0E0');
+  }
 
   const axisYFee = document.getElementById('axisYFee');
   const axisYFeeBorder = document.getElementById('axisYFeeBorder');
