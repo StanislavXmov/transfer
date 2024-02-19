@@ -31,7 +31,7 @@ const toCountry = document.getElementById('toCountry');
 const marketValue = document.getElementById('marketValue');
 const fee = document.getElementById('fee');
 
-const axisData = [0, 10_000, 100_000, 1_000_000, 10_000_000, 100_000_000, 1_000_000_000];
+const axisData = [0, 100_000, 1_000_000, 10_000_000, 100_000_000, 1_000_000_000];
 const axisDataY = [50_000, 100_000, 1_000_000, 10_000_000, 100_000_000, 1_000_000_000];
 const axisDataString = {
   "0": "0",
@@ -51,14 +51,14 @@ const paddingLeft = 32;
 const dy = axisStep * 1.65;
 
 const width = (axisData.length - 1) * axisStep + axisStep;
-const height = (axisData.length - 1) * axisStepY + axisStepY;
+const height = (axisData.length) * axisStepY + axisStepY;
 
 axisYTop.style.top = `${axisStepY * 2.5}px`;
 axisYTopBorder.style.top = `${axisStepY * 2.5}px`;
 axisYTopBorder.style.width = `${axisStepY * 4.5}px`;
 // axisX.style.top = `${axisStepY * 5 + 6}px`;
 axisX.style.top = `${height - axisStepY / 4 - dy + 3}px`;
-axisX.style.left = `${axisStep * 5 + axisStep / 2 + 10}px`;
+axisX.style.left = `${axisStep * 5 + axisStep / 2 + 32}px`;
 
 const axis = {
   x: {},
@@ -69,9 +69,30 @@ axisData.forEach((step, i) => {
   if (!axisData[i + 1]) {
     return;
   }
-  axis.x[step] = d3.scaleLinear()
-    .domain([step, axisData[i + 1]])
-    .range([i * axisStep, (i + 1) * axisStep]);
+  if (i === 0) {
+    axis.x[step] = d3.scaleLinear()
+      .domain([step, axisData[i + 1]])
+      .range([0, 40]);
+  } else if (i === 1) {
+    axis.x[step] = d3.scaleLinear()
+      .domain([step, axisData[i + 1]])
+      .range([40, 200]);
+  } else if (i === 2) {
+    axis.x[step] = d3.scaleLinear()
+      .domain([step, axisData[i + 1]])
+      .range([200, 360]);
+  } else if (i === 3) {
+    axis.x[step] = d3.scaleLinear()
+      .domain([step, axisData[i + 1]])
+      .range([360, 520]);
+  } else if (i === 4) {
+    axis.x[step] = d3.scaleLinear()
+      .domain([step, axisData[i + 1]])
+      .range([520, 680]);
+  } 
+  // axis.x[step] = d3.scaleLinear()
+  //   .domain([step, axisData[i + 1]])
+  //   .range([i * axisStep, (i + 1) * axisStep]);
 });
 
 axisDataY.forEach((step, i) => {
@@ -107,9 +128,40 @@ const lineGroup = svg.append('g')
     .attr("id", 'line');
     
   for (let i = 0; i < 6; i++) {
-    lineGroup.append('path')
-    .attr("d", `M${axisStep * i + paddingLeft} ${height - axisStepY / 4 - dy + 6}V${height - axisStepY / 4 - dy + 18}`)
-    .attr('stroke', '#E0E0E0');
+    if (i === 0) {
+      lineGroup.append('path')
+        .attr("d", `
+        M${0 + paddingLeft} ${height - axisStepY / 4 - dy + 6}V${height - axisStepY / 4 - dy + 18}
+        `)
+        .attr('stroke', '#E0E0E0');
+    } else if (i === 1) {
+      lineGroup.append('path')
+        .attr("d", `
+        M${40 + paddingLeft} ${height - axisStepY / 4 - dy + 6}V${height - axisStepY / 4 - dy + 18}
+        `)
+        .attr('stroke', '#E0E0E0');
+    } else if (i === 2) {
+      lineGroup.append('path')
+        .attr("d", `
+        M${200 + paddingLeft} ${height - axisStepY / 4 - dy + 6}V${height - axisStepY / 4 - dy + 18}
+        `)
+        .attr('stroke', '#E0E0E0');
+    } else if (i === 3) {
+      lineGroup.append('path')
+        .attr("d", `
+        M${360 + paddingLeft} ${height - axisStepY / 4 - dy + 6}V${height - axisStepY / 4 - dy + 18}
+        `)
+        .attr('stroke', '#E0E0E0');
+    } else if (i === 4) {
+      lineGroup.append('path')
+        .attr("d", `
+        M${520 + paddingLeft} ${height - axisStepY / 4 - dy + 6}V${height - axisStepY / 4 - dy + 18}
+        `)
+        .attr('stroke', '#E0E0E0');
+    } 
+    // lineGroup.append('path')
+    // .attr("d", `M${axisStep * i + paddingLeft} ${height - axisStepY / 4 - dy + 6}V${height - axisStepY / 4 - dy + 18}`)
+    // .attr('stroke', '#E0E0E0');
   }
 
 svg.selectAll('.domainX')
@@ -275,6 +327,24 @@ const d1 = "M0 3C0 4.65685 1.34315 6 3 6V0C1.34315 0 0 1.34315 0 3Z";
 const d2 = "M3 6C4.65685 6 6 4.65685 6 3C6 1.34315 4.65685 0 3 0V6Z";
 
 const createPoints = (data) => {
+
+  // test
+  // const dataObj = {};
+  // axisData.forEach(n => {
+  //   dataObj[n] = 0;
+  // });
+  // console.log(dataObj);
+  // data.forEach(t => {
+  //   const marketValue = getMarketValue(t[marketValueField]);
+  //   // console.log(marketValue);
+  //   for (let j = axisData.length - 1; j > 0; j--) {
+  //     const axisValue = axisData[j];
+  //     if (marketValue >= axisValue) {
+  //       dataObj[axisValue] += 1;
+  //       break;
+  //     }
+  //   }
+  // });
   
   svg.append("g")
     .attr("id", "group1")
@@ -464,9 +534,34 @@ const createFeePoints = (data) => {
     .attr('stroke', '#E0E0E0');
 
   for (let i = 0; i < 6; i++) {
-    feeLineGroup.append('path')
-    .attr("d", `M${axisStep * i + paddingLeft} ${height / 2 + 6}V${height / 2 - 2}`)
-    .attr('stroke', '#E0E0E0');
+    if (i === 0) {
+      feeLineGroup.append('path')
+        .attr("d", `M${0 + paddingLeft} ${height / 2 + 6}V${height / 2 - 2}`)
+        .attr('stroke', '#E0E0E0');
+    } else if (i === 1) {
+      feeLineGroup.append('path')
+        .attr("d", `M${25 + paddingLeft} ${height / 2 + 6}V${height / 2 - 2}`)
+        .attr('stroke', '#E0E0E0');
+    } else if (i === 2) {
+      feeLineGroup.append('path')
+        .attr("d", `M${50 + paddingLeft} ${height / 2 + 6}V${height / 2 - 2}`)
+        .attr('stroke', '#E0E0E0');
+    } else if (i === 3) {
+      feeLineGroup.append('path')
+        .attr("d", `M${225 + paddingLeft} ${height / 2 + 6}V${height / 2 - 2}`)
+        .attr('stroke', '#E0E0E0');
+    } else if (i === 4) {
+      feeLineGroup.append('path')
+        .attr("d", `M${400 + paddingLeft} ${height / 2 + 6}V${height / 2 - 2}`)
+        .attr('stroke', '#E0E0E0');
+    } else if (i === 5) {
+      feeLineGroup.append('path')
+        .attr("d", `M${500 + paddingLeft} ${height / 2 + 6}V${height / 2 - 2}`)
+        .attr('stroke', '#E0E0E0');
+    }
+    // feeLineGroup.append('path')
+    // .attr("d", `M${axisStep * i + paddingLeft} ${height / 2 + 6}V${height / 2 - 2}`)
+    // .attr('stroke', '#E0E0E0');
   }
 
   const axisYFee = document.getElementById('axisYFee');
