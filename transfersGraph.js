@@ -59,6 +59,11 @@ axisYTopBorder.style.width = `${axisStepY * 4.5}px`;
 // axisX.style.top = `${axisStepY * 5 + 6}px`;
 axisX.style.top = `${height - axisStepY / 4 - dy + 3}px`;
 axisX.style.left = `${axisStep * 5 + axisStep / 2 + 32}px`;
+axisX.style.left = `${axisStep * 5 + axisStep / 2 + 32}px`;
+if (axisStep < 100) {
+  axisX.style.left = `auto`;
+  axisX.style.right = `0px`;
+}
 
 const axis = {
   x: {},
@@ -194,7 +199,7 @@ axis.y[0] = d3.scaleLinear()
 const getX = (d) => {
   for (let j = axisData.length - 1; j >= 0; j--) {
     const x = axisData[j - 1];
-    const v = Number(d[marketValueField].split(',').join(''));
+    const v = getMarketValue(d[marketValueField]);
     if (v >= x) {
       return axis.x[x];
     }
@@ -215,10 +220,10 @@ const getMarketValue = (v) => Number(v.split(',').join(''));
 
 const setState = (d, state) => {
   if (d[feeField] === '0' || d[feeField] === '?') {
-    if (state[Number(d[marketValueField].split(',').join(''))]) {
-      state[Number(d[marketValueField].split(',').join(''))] += 1; 
+    if (state[getMarketValue(d[marketValueField])]) {
+      state[getMarketValue(d[marketValueField])] += 1; 
     } else {
-      state[Number(d[marketValueField].split(',').join(''))] = 1;
+      state[getMarketValue(d[marketValueField])] = 1;
     }
   }
 }
@@ -282,7 +287,7 @@ const circleOver = (e) => {
       toTeam.textContent = d[toTeamField];
       toLeague.textContent = d[toLeagueField];
       toCountry.textContent = d[toCountryField];
-      marketValue.textContent = Number(d[marketValueField].split(',').join('')).toLocaleString();
+      marketValue.textContent = getMarketValue(d[marketValueField]).toLocaleString();
       fee.textContent = Number(d[feeField]).toLocaleString();
     }
   }
@@ -312,7 +317,7 @@ const feeCircleOver = (e) => {
       toTeam.textContent = d[toTeamField];
       toLeague.textContent = d[toLeagueField];
       toCountry.textContent = d[toCountryField];
-      marketValue.textContent = Number(d[marketValueField].split(',').join('')).toLocaleString();
+      marketValue.textContent = getMarketValue(d[marketValueField]).toLocaleString();
       fee.textContent = Number(d[feeField]).toLocaleString();
     }
   }
@@ -377,7 +382,7 @@ const createPoints = (data) => {
         }
         return `
         translate(
-          ${getX(d)(Number(d[marketValueField].split(',').join(''))) + paddingLeft - 3}, 
+          ${getX(d)(getMarketValue(d[marketValueField])) + paddingLeft - 3}, 
           ${getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy - 20})
         `})
       .append("circle")
@@ -387,7 +392,7 @@ const createPoints = (data) => {
       .attr("stroke", "#00000060")
       .attr("fill", "none")
       .attr("data-index", (d, i) => d[transferIdField])
-      .attr("data-left", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + paddingLeft - 3)
+      .attr("data-left", d => getX(d)(getMarketValue(d[marketValueField])) + paddingLeft - 3)
       // .attr("data-top", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy)
       .attr("data-top", d => {
         if (d[feeField] === '0' || d[feeField] === '?') {
@@ -404,7 +409,7 @@ const createPoints = (data) => {
         .attr("d", d1)
         .attr("fill", d => getFromColor(d))
         .attr("data-index", (d, i) => d[transferIdField])
-        .attr("data-left", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + paddingLeft - 3)
+        .attr("data-left", d => getX(d)(getMarketValue(d[marketValueField])) + paddingLeft - 3)
         // .attr("data-top", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy)
         .attr("data-top", d => {
           if (d[feeField] === '0' || d[feeField] === '?') {
@@ -421,7 +426,7 @@ const createPoints = (data) => {
         .attr("d", d2)
         .attr("fill", d => getToColor(d))
         .attr("data-index", (d, i) => d[transferIdField])
-        .attr("data-left", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + paddingLeft - 3)
+        .attr("data-left", d => getX(d)(getMarketValue(d[marketValueField])) + paddingLeft - 3)
         // .attr("data-top", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy);
         .attr("data-top", d => {
           if (d[feeField] === '0' || d[feeField] === '?') {
@@ -595,12 +600,14 @@ const createFeePoints = (data) => {
           setState(d, yInState);
           const n = yInState[getMarketValue(d[marketValueField])];
           const dy = inDataState[getMarketValue(d[marketValueField])].n;
-          y = height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) - n * dy - 3;
+          const axisDy = (dy === 3 ? 6 : 3);
+          y = height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) - n * dy - axisDy;
         } else {
           setState(d, yOutState);
           const n = yOutState[getMarketValue(d[marketValueField])];
           const dy = outDataState[getMarketValue(d[marketValueField])].n;
-          y = height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) + n * dy + 3;
+          const axisDy = (dy === 3 ? 6 : 3);
+          y = height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) + n * dy + axisDy;
         }
         return `
           translate(
@@ -621,11 +628,13 @@ const createFeePoints = (data) => {
           setState(d, yInStatePL);
           const n = yInStatePL[getMarketValue(d[marketValueField])];
           const dy = inDataState[getMarketValue(d[marketValueField])].n;
+          const axisDy = (dy === 3 ? 6 : 3);
           return height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) - n * dy - 3;
         } else {
           setState(d, yOutStatePL);
           const n = yOutStatePL[getMarketValue(d[marketValueField])];
           const dy = outDataState[getMarketValue(d[marketValueField])].n;
+          const axisDy = (dy === 3 ? 6 : 3);
           return height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) + n * dy + 3;
         }
       })
@@ -641,11 +650,13 @@ const createFeePoints = (data) => {
             setState(d, yInStatePR);
             const n = yInStatePR[getMarketValue(d[marketValueField])];
             const dy = inDataState[getMarketValue(d[marketValueField])].n;
+            const axisDy = (dy === 3 ? 6 : 3);
             return height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) - n * dy - 3;
           } else {
             setState(d, yOutStatePR);
             const n = yOutStatePR[getMarketValue(d[marketValueField])];
             const dy = outDataState[getMarketValue(d[marketValueField])].n;
+            const axisDy = (dy === 3 ? 6 : 3);
             return height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) + n * dy + 3;
           }
         })
@@ -654,17 +665,19 @@ const createFeePoints = (data) => {
         .attr("d", d2)
         .attr("fill", d => getToColor(d))
         .attr("data-index", (d, i) => d[transferIdField])
-        .attr("data-left", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + paddingLeft - 3)
+        .attr("data-left", d => getX(d)(getMarketValue(d[marketValueField])) + paddingLeft - 3)
         .attr("data-top", d => {
             if (d[typeField] === insideType || d[typeField] === inType) {
               setState(d, yInStatePC);
               const n = yInStatePC[getMarketValue(d[marketValueField])];
               const dy = inDataState[getMarketValue(d[marketValueField])].n;
+              const axisDy = (dy === 3 ? 6 : 3);
               return height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) - n * dy - 3;
             } else {
               setState(d, yOutStatePC);
               const n = yOutStatePC[getMarketValue(d[marketValueField])];
               const dy = outDataState[getMarketValue(d[marketValueField])].n;
+              const axisDy = (dy === 3 ? 6 : 3);
               return height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) + n * dy + 3;
             }
         });
