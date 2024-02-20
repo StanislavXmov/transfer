@@ -1,5 +1,6 @@
 import * as d3 from 'd3';
 import { feeField, fromCountryField, fromLeagueField, fromRegionField, fromTeamField, inType, insideType, marketValueField, outType, playerField, region, toCountryField, toLeagueField, toRegionField, toTeamField, transferIdField, typeField } from './fields';
+import { top } from './order';
 
 export const colors = {
   'Top': '#FEFEFE',
@@ -331,6 +332,9 @@ const circleOut = (e) => {
 const d1 = "M0 3C0 4.65685 1.34315 6 3 6V0C1.34315 0 0 1.34315 0 3Z";
 const d2 = "M3 6C4.65685 6 6 4.65685 6 3C6 1.34315 4.65685 0 3 0V6Z";
 
+const outD = 'M2 5L5 2M5 5L2 2';
+const inD = 'M5 3.5H1.5M5 3.5L3.5 2M5 3.5L3.5 5';
+
 const createPoints = (data) => {
 
   // test
@@ -359,85 +363,46 @@ const createPoints = (data) => {
       .on('mouseover', circleOver)
       .on('mouseout', circleOut)
       .style("cursor", "pointer")
-      // .attr("data-index", (d, i) => i)
-      // .attr("data-left", d => getX(d)(Number(d[marketValueField].split(',').join(''))) + paddingLeft - 3)
-      // .attr("data-top", d => {
-      //   if (d[feeField] === '0' || d[feeField] === '?') {
-      //     const n = yState[Number(d[marketValueField].split(',').join(''))];
-      //     return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy + 20 + n * 3
-      //   }
-        
-      //   return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy;
-      // })
       .attr("transform", d => {
-        if (d[feeField] === '0' || d[feeField] === '?') {
-          // setYState(d);
-          // const n = yState[Number(d[marketValueField].split(',').join(''))];
-          // return `
-          //   translate(
-          //     ${getX(d)(Number(d[marketValueField].split(',').join(''))) + paddingLeft - 3}, 
-          //     ${getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy + 20 + n * 3 + 10})
-          //   `;
-          return null;
-        }
         return `
         translate(
           ${getX(d)(getMarketValue(d[marketValueField])) + paddingLeft - 3}, 
           ${getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy - 20})
         `})
       .append("circle")
-      .attr("cx", 3)
-      .attr("cy", 3)
-      .attr("r", 3.5)
-      .attr("stroke", "#00000060")
-      .attr("fill", "none")
-      .attr("data-index", (d, i) => d[transferIdField])
-      .attr("data-left", d => getX(d)(getMarketValue(d[marketValueField])) + paddingLeft - 3)
-      // .attr("data-top", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy)
-      .attr("data-top", d => {
-        if (d[feeField] === '0' || d[feeField] === '?') {
-          // setYStatePL(d);
-          // const n = yStatePL[Number(d[marketValueField].split(',').join(''))];
-          // return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy + 20 + n * 3
-          return null;
-        }
-        
-        return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy - 20;
-      })
-      .select(function() { return this.parentNode; })
-      .append("path")
-        .attr("d", d1)
-        .attr("fill", d => getFromColor(d))
+        .attr("cx", 3.5)
+        .attr("cy", 3.5)
+        .attr("r", 3.5)
+        .attr("fill", d => {
+          if (d[typeField] === insideType || d[typeField] === inType) {
+            return getFromColor(d);
+          } else {
+            return getToColor(d);
+          }
+        })
+        .attr("stroke", d => {
+          if (d[fromRegionField] === region && d[toRegionField] === region) {
+            return "#00000060";
+          } else {
+            getToColor(d)
+          }
+        })
         .attr("data-index", (d, i) => d[transferIdField])
         .attr("data-left", d => getX(d)(getMarketValue(d[marketValueField])) + paddingLeft - 3)
-        // .attr("data-top", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy)
         .attr("data-top", d => {
-          if (d[feeField] === '0' || d[feeField] === '?') {
-            // setYStatePR(d);
-            // const n = yStatePR[Number(d[marketValueField].split(',').join(''))];
-            // return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy + 20 + n * 3
-            return null;
-          }
-          
           return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy - 20;
         })
         .select(function() { return this.parentNode; })
-        .append("path")
-        .attr("d", d2)
-        .attr("fill", d => getToColor(d))
-        .attr("data-index", (d, i) => d[transferIdField])
-        .attr("data-left", d => getX(d)(getMarketValue(d[marketValueField])) + paddingLeft - 3)
-        // .attr("data-top", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy);
-        .attr("data-top", d => {
-          if (d[feeField] === '0' || d[feeField] === '?') {
-            // setYStatePC(d);
-            // const n = yStatePC[Number(d[marketValueField].split(',').join(''))];
-            // return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy + 20 + n * 3
-            return null;
-          }
-          
-          return getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy - 20;
-        });
+          .append("path")
+          .attr("data-index", (d, i) => d[transferIdField])
+          .attr("d", d => {
+            if (d[typeField] === insideType || d[typeField] === inType) {
+              return inD
+            } else {
+              return outD;
+            }
+          })
+          .attr('stroke', '#FFFFFF');
 
     // const maxh = Math.max(...Object.values(yState)) * 3;
     // axisYBottom.style.top = `${axisStep * 5 + maxh}px`;
@@ -616,11 +581,23 @@ const createFeePoints = (data) => {
         `;
         })
       .append("circle")
-      .attr("cx", 3)
-      .attr("cy", 3)
-      .attr("r", 3.5)
-      .attr("stroke", "#00000060")
-      .attr("fill", "none")
+        .attr("cx", 3.5)
+        .attr("cy", 3.5)
+        .attr("r", 3.5)
+        .attr("fill", d => {
+          if (d[typeField] === insideType || d[typeField] === inType) {
+            return getFromColor(d);
+          } else {
+            return getToColor(d);
+          }
+        })
+        .attr("stroke", d => {
+          if (d[fromRegionField] === region && d[toRegionField] === region) {
+            return "#00000060";
+          } else {
+            getToColor(d)
+          }
+        })
       .attr("data-index", (d, i) => d[transferIdField])
       .attr("data-left", d => getX(d)(getMarketValue(d[marketValueField])) + paddingLeft - 3)
       .attr("data-top", d => {
@@ -629,58 +606,26 @@ const createFeePoints = (data) => {
           const n = yInStatePL[getMarketValue(d[marketValueField])];
           const dy = inDataState[getMarketValue(d[marketValueField])].n;
           const axisDy = (dy === 3 ? 6 : 3);
-          return height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) - n * dy - 3;
+          return height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) - n * dy - axisDy;
         } else {
           setState(d, yOutStatePL);
           const n = yOutStatePL[getMarketValue(d[marketValueField])];
           const dy = outDataState[getMarketValue(d[marketValueField])].n;
           const axisDy = (dy === 3 ? 6 : 3);
-          return height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) + n * dy + 3;
+          return height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) + n * dy + axisDy;
         }
       })
       .select(function() { return this.parentNode; })
-      .append("path")
-        .attr("d", d1)
-        .attr("fill", d => getFromColor(d))
+        .append("path")
         .attr("data-index", (d, i) => d[transferIdField])
-        .attr("data-left", d => getX(d)(getMarketValue(d[marketValueField])) + paddingLeft - 3)
-        // .attr("data-top", d => getY(d)(d[feeField] === '?' ? 0 : d[feeField]) - axisStep / 4 - 3 - dy)
-        .attr("data-top", d => {
+        .attr("d", d => {
           if (d[typeField] === insideType || d[typeField] === inType) {
-            setState(d, yInStatePR);
-            const n = yInStatePR[getMarketValue(d[marketValueField])];
-            const dy = inDataState[getMarketValue(d[marketValueField])].n;
-            const axisDy = (dy === 3 ? 6 : 3);
-            return height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) - n * dy - 3;
+            return inD
           } else {
-            setState(d, yOutStatePR);
-            const n = yOutStatePR[getMarketValue(d[marketValueField])];
-            const dy = outDataState[getMarketValue(d[marketValueField])].n;
-            const axisDy = (dy === 3 ? 6 : 3);
-            return height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) + n * dy + 3;
+            return outD;
           }
         })
-        .select(function() { return this.parentNode; })
-        .append("path")
-        .attr("d", d2)
-        .attr("fill", d => getToColor(d))
-        .attr("data-index", (d, i) => d[transferIdField])
-        .attr("data-left", d => getX(d)(getMarketValue(d[marketValueField])) + paddingLeft - 3)
-        .attr("data-top", d => {
-            if (d[typeField] === insideType || d[typeField] === inType) {
-              setState(d, yInStatePC);
-              const n = yInStatePC[getMarketValue(d[marketValueField])];
-              const dy = inDataState[getMarketValue(d[marketValueField])].n;
-              const axisDy = (dy === 3 ? 6 : 3);
-              return height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) - n * dy - 3;
-            } else {
-              setState(d, yOutStatePC);
-              const n = yOutStatePC[getMarketValue(d[marketValueField])];
-              const dy = outDataState[getMarketValue(d[marketValueField])].n;
-              const axisDy = (dy === 3 ? 6 : 3);
-              return height / 2 + Number(d[feeField] === '?' ? 0 : d[feeField]) + n * dy + 3;
-            }
-        });
+        .attr('stroke', '#FFFFFF');
 }
 
 const clearGraph = () => {
