@@ -363,6 +363,7 @@ const createPoints = (data) => {
       .on('mouseover', circleOver)
       .on('mouseout', circleOut)
       .style("cursor", "pointer")
+      // .style("opacity", "0.8")
       .attr("transform", d => {
         return `
         translate(
@@ -457,14 +458,14 @@ const createFeePoints = (data) => {
   const maxIn = Math.max(...Object.values(inDataState).map(v => v.counter))
   const maxOut = Math.max(...Object.values(outDataState).map(v => v.counter));
   for (const fee in inDataState) {
-    if (inDataState[fee].counter / maxIn > 0.75 && inDataState[fee].counter > 20) {
+    if (maxIn > 20 || maxOut > 20) {
       inDataState[fee].n = 3;
     } else {
       inDataState[fee].n = 6;
     }
   }
   for (const fee in outDataState) {
-    if (outDataState[fee].counter / maxIn > 0.75 && outDataState[fee].counter > 20) {
+    if (maxIn > 20 || maxOut > 20) {
       outDataState[fee].n = 3;
     } else {
       outDataState[fee].n = 6;
