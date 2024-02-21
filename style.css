@@ -320,3 +320,7 @@ svg g text {
   border-left: 1px solid rgba(0, 0, 0, 0.2);
   border-right: 1px solid rgba(0, 0, 0, 0.2);
 }
+
+.playerImage {
+  height: 180px;
+}

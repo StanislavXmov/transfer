@@ -1174,14 +1174,3 @@ tableFeeField.addEventListener('click', () => {
     renderTable(currentTableData, firstFilter, secondFilter, thirdFilter, fourthFilter);
   }
 });
-
-// fetch('https://www.transfermarkt.com/jarrad-branthwaite/profil/spieler/661053')
-//   .then(res => res.text())
-//   .then(text => {
-//     const index = text.indexOf('<img src="https://img.a.transfermarkt.technology/portrait/header/')
-//     const newStr = text.substring(index);
-//     const lastIndex = newStr.indexOf(" title=");
-//     const firstIndex = newStr.indexOf("https://img.a");
-//     const link = newStr.substring(firstIndex, lastIndex - 1);
-//     console.log(link);
-//   });

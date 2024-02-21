@@ -1,6 +1,7 @@
 import * as d3 from 'd3';
 import { feeField, fromCountryField, fromLeagueField, fromRegionField, fromTeamField, inType, insideType, marketValueField, outType, playerField, region, toCountryField, toLeagueField, toRegionField, toTeamField, transferIdField, typeField } from './fields';
-import { top } from './order';
+import { players } from './players';
+
 
 export const colors = {
   'Top': '#FEFEFE',
@@ -21,6 +22,7 @@ const axisX = document.getElementById('axisX');
 const clientWidth = container.clientWidth;
 const transferInfo = document.getElementById('transferInfo');
 // const info = document.getElementById('info');
+const playerImage = document.getElementById('playerImage');
 const name = document.getElementById('name');
 const fromTeam = document.getElementById('fromTeam');
 const age = document.getElementById('age');
@@ -281,6 +283,7 @@ const circleOver = (e) => {
       
       // info.textContent = JSON.stringify(d);
       name.textContent = d[playerField];
+      playerImage.src = players[d[playerField]].img;
       age.textContent = d['Age'];
       fromTeam.textContent = d[fromTeamField];
       fromLeague.textContent = d[fromLeagueField];
@@ -311,6 +314,7 @@ const feeCircleOver = (e) => {
       }
       
       name.textContent = d[playerField];
+      playerImage.src = players[d[playerField]].img;
       age.textContent = d['Age'];
       fromTeam.textContent = d[fromTeamField];
       fromLeague.textContent = d[fromLeagueField];
@@ -326,6 +330,7 @@ const feeCircleOver = (e) => {
 
 const circleOut = (e) => {
   transferInfo.style.display = 'none';
+  playerImage.src = "";
   selected = '-1';
 }
 
@@ -403,6 +408,7 @@ const createPoints = (data) => {
               return outD;
             }
           })
+          .style("pointer-events", 'none')
           .attr('stroke', '#FFFFFF');
 
     // const maxh = Math.max(...Object.values(yState)) * 3;
@@ -626,6 +632,7 @@ const createFeePoints = (data) => {
             return outD;
           }
         })
+        .style("pointer-events", 'none')
         .attr('stroke', '#FFFFFF');
 }
 
