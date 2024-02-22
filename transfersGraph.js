@@ -49,9 +49,11 @@ const axisDataString = {
 // min 45;
 // const axisStep = 75;
 const axisStepY = Math.min(Math.round(clientWidth / 7), 80);
-const axisStep = Math.min(Math.round(clientWidth / 7), 100);
+// const axisStep = Math.min(Math.round(clientWidth / 7), 100);
+const axisStep = Math.round(clientWidth / 7);
 const paddingLeft = 32;
-const dy = axisStep * 1.65;
+// const dy = axisStep * 1.65;
+const dy = axisStepY * 2.1;
 
 const width = (axisData.length - 1) * axisStep + axisStep;
 const height = (axisData.length) * axisStepY + axisStepY;
@@ -73,6 +75,8 @@ const axis = {
   y: {},
 };
 
+const stepD = width * 1.13;
+const stepXD = Math.round(stepD / 17);
 axisData.forEach((step, i) => {
   if (!axisData[i + 1]) {
     return;
@@ -80,27 +84,24 @@ axisData.forEach((step, i) => {
   if (i === 0) {
     axis.x[step] = d3.scaleLinear()
       .domain([step, axisData[i + 1]])
-      .range([0, 40]);
+      .range([0, stepXD]);
   } else if (i === 1) {
     axis.x[step] = d3.scaleLinear()
       .domain([step, axisData[i + 1]])
-      .range([40, 200]);
+      .range([stepXD, stepXD + (stepXD * 4) * i]);
   } else if (i === 2) {
     axis.x[step] = d3.scaleLinear()
       .domain([step, axisData[i + 1]])
-      .range([200, 360]);
+      .range([stepXD + (stepXD * 4) * (i - 1), stepXD + (stepXD * 4) * i]);
   } else if (i === 3) {
     axis.x[step] = d3.scaleLinear()
       .domain([step, axisData[i + 1]])
-      .range([360, 520]);
+      .range([stepXD + (stepXD * 4) * (i - 1), stepXD + (stepXD * 4) * i]);
   } else if (i === 4) {
     axis.x[step] = d3.scaleLinear()
       .domain([step, axisData[i + 1]])
-      .range([520, 680]);
+      .range([stepXD + (stepXD * 4) * (i - 1), stepXD + (stepXD * 4) * i]);
   } 
-  // axis.x[step] = d3.scaleLinear()
-  //   .domain([step, axisData[i + 1]])
-  //   .range([i * axisStep, (i + 1) * axisStep]);
 });
 
 axisDataY.forEach((step, i) => {
@@ -145,31 +146,28 @@ const lineGroup = svg.append('g')
     } else if (i === 1) {
       lineGroup.append('path')
         .attr("d", `
-        M${40 + paddingLeft} ${height - axisStepY / 4 - dy + 6}V${height - axisStepY / 4 - dy + 18}
+        M${stepXD + paddingLeft} ${height - axisStepY / 4 - dy + 6}V${height - axisStepY / 4 - dy + 18}
         `)
         .attr('stroke', '#E0E0E0');
     } else if (i === 2) {
       lineGroup.append('path')
         .attr("d", `
-        M${200 + paddingLeft} ${height - axisStepY / 4 - dy + 6}V${height - axisStepY / 4 - dy + 18}
+        M${stepXD + (stepXD * 4) * (i - 1) + paddingLeft} ${height - axisStepY / 4 - dy + 6}V${height - axisStepY / 4 - dy + 18}
         `)
         .attr('stroke', '#E0E0E0');
     } else if (i === 3) {
       lineGroup.append('path')
         .attr("d", `
-        M${360 + paddingLeft} ${height - axisStepY / 4 - dy + 6}V${height - axisStepY / 4 - dy + 18}
+        M${stepXD + (stepXD * 4) * (i - 1) + paddingLeft} ${height - axisStepY / 4 - dy + 6}V${height - axisStepY / 4 - dy + 18}
         `)
         .attr('stroke', '#E0E0E0');
     } else if (i === 4) {
       lineGroup.append('path')
         .attr("d", `
-        M${520 + paddingLeft} ${height - axisStepY / 4 - dy + 6}V${height - axisStepY / 4 - dy + 18}
+        M${stepXD + (stepXD * 4) * (i - 1) + paddingLeft} ${height - axisStepY / 4 - dy + 6}V${height - axisStepY / 4 - dy + 18}
         `)
         .attr('stroke', '#E0E0E0');
     } 
-    // lineGroup.append('path')
-    // .attr("d", `M${axisStep * i + paddingLeft} ${height - axisStepY / 4 - dy + 6}V${height - axisStepY / 4 - dy + 18}`)
-    // .attr('stroke', '#E0E0E0');
   }
 
 svg.selectAll('.domainX')
@@ -517,28 +515,25 @@ const createFeePoints = (data) => {
         .attr('stroke', '#E0E0E0');
     } else if (i === 1) {
       feeLineGroup.append('path')
-        .attr("d", `M${25 + paddingLeft} ${height / 2 + 6}V${height / 2 - 2}`)
+        .attr("d", `M${stepXD + paddingLeft} ${height / 2 + 6}V${height / 2 - 2}`)
         .attr('stroke', '#E0E0E0');
     } else if (i === 2) {
       feeLineGroup.append('path')
-        .attr("d", `M${50 + paddingLeft} ${height / 2 + 6}V${height / 2 - 2}`)
+        .attr("d", `M${stepXD + (stepXD * 4) * (i - 1) + paddingLeft} ${height / 2 + 6}V${height / 2 - 2}`)
         .attr('stroke', '#E0E0E0');
     } else if (i === 3) {
       feeLineGroup.append('path')
-        .attr("d", `M${225 + paddingLeft} ${height / 2 + 6}V${height / 2 - 2}`)
+        .attr("d", `M${stepXD + (stepXD * 4) * (i - 1) + paddingLeft} ${height / 2 + 6}V${height / 2 - 2}`)
         .attr('stroke', '#E0E0E0');
     } else if (i === 4) {
       feeLineGroup.append('path')
-        .attr("d", `M${400 + paddingLeft} ${height / 2 + 6}V${height / 2 - 2}`)
+        .attr("d", `M${stepXD + (stepXD * 4) * (i - 1) + paddingLeft} ${height / 2 + 6}V${height / 2 - 2}`)
         .attr('stroke', '#E0E0E0');
     } else if (i === 5) {
       feeLineGroup.append('path')
-        .attr("d", `M${500 + paddingLeft} ${height / 2 + 6}V${height / 2 - 2}`)
+        .attr("d", `M${stepXD + (stepXD * 4) * (i - 1) + paddingLeft} ${height / 2 + 6}V${height / 2 - 2}`)
         .attr('stroke', '#E0E0E0');
     }
-    // feeLineGroup.append('path')
-    // .attr("d", `M${axisStep * i + paddingLeft} ${height / 2 + 6}V${height / 2 - 2}`)
-    // .attr('stroke', '#E0E0E0');
   }
 
   const axisYFee = document.getElementById('axisYFee');
