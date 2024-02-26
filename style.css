@@ -263,6 +263,10 @@ svg g text {
   font-size: 12px;
 }
 
+#positions {
+  width: 100%;
+}
+
 .feePoints {
   margin-top: -10px;
   

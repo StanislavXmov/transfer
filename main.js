@@ -19,7 +19,7 @@ import { fromCountries } from './filter/checked/fromCountries';
 import { toCountries } from './filter/checked/toCountries';
 import { fromLegues } from './filter/checked/fromLegues';
 import { toLeagues } from './filter/checked/toLeagues';
-import { feeField, fromCountryField, fromLeagueField, fromRegionField, fromTeamField, inType, insideType, marketValueField, outType, playerField, region, toCountryField, toLeagueField, toRegionField, toTeamField, transferIdField, typeField } from './fields';
+import { allPositions, feeField, fromCountryField, fromLeagueField, fromRegionField, fromTeamField, inType, insideType, marketValueField, outType, playerField, positionField, region, toCountryField, toLeagueField, toRegionField, toTeamField, transferIdField, typeField } from './fields';
 import { fromLeagueToTeams } from './filter/teams/fromLeagueToTeams';
 import { fromLeagueToTeamsOut } from './filter/teams/fromLeagueToTeamsOut';
 import { fromTeams } from './filter/checked/fromTeams';
@@ -38,6 +38,7 @@ const tableContent = document.getElementById('tableContent');
 const buttonLoadMore = document.getElementById('loadMore');
 const tableMarketField = document.getElementById('tableMarketValue');
 const tableFeeField = document.getElementById('tableFeeValue');
+const positionSelector = document.getElementById('positions');
 
 const titleWidth = 100;
 const clientWidth = (container.clientWidth - (titleWidth * 2) - 0) / 2;
@@ -82,6 +83,7 @@ const max = 'max';
 const min = 'min';
 let marketTableFilter = null;
 let feeTableFilter = null;
+let positionSelectorValue = allPositions;
 
 const createGraphsWithMoreNodes = (leftData, rightData, newHeight, data) => {
   clearGraph(graphRightId, right);
@@ -1063,6 +1065,11 @@ const createGraph = (id, type, graph, height, data) => {
 const renderTable = (data, firstFilter, secondFilter, thirdFilter, fourthFilter) => {
   let dataset = [...data];
   
+  // check selectors
+  if (positionSelectorValue !== allPositions) {
+    dataset = dataset.filter(t => t[positionField] === positionSelectorValue);
+  }
+  
   // check filters
   if (marketTableFilter === max) {
     dataset.sort((t1, t2) => formatMarketValue(t2[marketValueField]) - formatMarketValue(t1[marketValueField]));
@@ -1114,7 +1121,7 @@ const renderTable = (data, firstFilter, secondFilter, thirdFilter, fourthFilter)
   }
 
   // all table filters
-  if (!marketTableFilter && !feeTableFilter) {
+  if (!marketTableFilter && !feeTableFilter && positionSelectorValue === allPositions) {
     currentTableData = dataset;
   }
   
@@ -1140,6 +1147,12 @@ const formatFeeValue = (s) => {
     return Number(s);
   }
 }
+
+positionSelector.addEventListener('change', e => {
+  positionSelectorValue = e.target.value;
+  const data = [...currentTableData];
+  renderTable(data, firstFilter, secondFilter, thirdFilter, fourthFilter);
+});
 
 tableMarketField.addEventListener('click', () => {
   if (!marketTableFilter) {

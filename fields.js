@@ -38,6 +38,7 @@ export const toTeamField = "To Team";
 export const marketValueField ='Market value';
 export const feeField ='Fee';
 export const ageField ='Age';
+export const positionField ='Position';
 
 export const outType = 'Out';
 export const inType = 'In';
@@ -45,3 +46,21 @@ export const insideType = 'Inside';
 
 export const region = 'Top';
 export const regionEurope = 'Europe, ex. Top Leagues';
+
+export const allPositions = 'All Positions';
+export const positions = [
+  "Left Winger",
+  "Central Midfield",
+  "Defensive Midfield",
+  "Right-Back",
+  "Right Winger",
+  "Centre-Back",
+  "Centre-Forward",
+  "Attacking Midfield",
+  "Goalkeeper",
+  "Left-Back",
+  "Right Midfield",
+  "Second Striker",
+  "Left Midfield",
+  "Midfield"
+];
